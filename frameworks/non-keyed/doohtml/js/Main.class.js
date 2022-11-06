@@ -113,7 +113,7 @@ Doo.define(
 		isRowSelected(elem) {
 			return elem.classList.contains('danger')
 		}
-		swapRows(e) {
+		swapRows() {
 			const A=1,B=998
 			if (this.data.rows.length > B) {
 				
