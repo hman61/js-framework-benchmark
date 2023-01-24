@@ -3,6 +3,40 @@
 function _random(max) {
     return Math.round(Math.random()*1000)%max;
 }
+class Timer {
+    static time = new Object()
+
+
+    static start(name) {
+	
+		if (!Timer.time[name]) {
+			Timer.time[name] = [ new Date().getTime()]    
+		}    
+	};
+	static stop(name) {
+		if (Timer.time[name]) {
+			Timer.time[name].push(new Date().getTime())
+            if (name==='clear') {
+                document.title = 'c:' + (Timer.time[name][1] - Timer.time[name][0])  + ' |' + document.title
+                Timer.time[name] = undefined
+            }
+
+            if (name==='build') {
+                document.title = 'b:' + (Timer.time[name][1] - Timer.time[name][0])  + ' ' + document.title
+                Timer.time[name] = undefined
+            }
+            if (name==='tot') {
+                document.title = '**|t:' + (Timer.time[name][1] - Timer.time[name][0])  + ' ' + document.title
+                Timer.time[name] = undefined
+            }
+            if (name==='add') {
+                document.title = 'a:' + (Timer.time[name][1] - Timer.time[name][0])  + ' ' + document.title
+                Timer.time[name] = undefined
+            } 
+		}
+	};
+}
+
 
 const rowTemplate = document.createElement("tr");
 rowTemplate.innerHTML = "<td class='col-md-1'></td><td class='col-md-4'><a class='lbl'></a></td><td class='col-md-1'><a class='remove'><span class='remove glyphicon glyphicon-remove' aria-hidden='true'></span></a></td><td class='col-md-6'></td>";
@@ -62,7 +96,7 @@ class Main {
             else if (e.target.matches('#swaprows')) {
                 e.preventDefault();
                 //console.log("swapRows");
-                this.swapRows();
+                this.swapRows(e);
             }
             else if (e.target.matches('.remove')) {
                 e.preventDefault();
@@ -149,8 +183,10 @@ class Main {
             this.unselect();
         // });
     }
-    swapRows() {
+    swapRows(e) {
+
         if (this.data.length > 998) {
+            Timer.start('tot')
 
             let tmp = this.data[998];
             this.data[998] = this.data[1];
@@ -163,6 +199,9 @@ class Main {
 
             this.tbody.insertBefore(c, b);
             this.tbody.insertBefore(a, d);
+            e.target.blur()
+            Timer.stop('tot')
+
         }
 
         // let old_selection = this.store.selected;

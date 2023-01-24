@@ -4,6 +4,11 @@
   <meta charset="utf-8" />
   <title>React Hooks</title>
   <link href="/css/currentStyle.css" rel="stylesheet"/>
+  <template id="table">
+    <table class="table table-hover table-striped test-data">
+      <tbody id="tbody"><tr bind="rows"><td class="col-md-1">{{id}}</td><td class="col-md-4"><a>{{label}}</a></td><td class="col-md-1"><a class="remove"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td class="col-md-6"></td></tr></tbody>
+    </table>
+  </template>
 </head>
 <body>
   <div id='main'></div>
