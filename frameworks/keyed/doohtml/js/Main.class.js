@@ -129,15 +129,15 @@ Doo.define(
 			this.data.rows = this.buildData(10000)
 			this.renderTable(this.data.rows, this.tbody)
 		}
-		runLots(e) {
-			Timer.start('tot')
-			this.clear(e)
-			this.data.rows = this.buildData(10000)	
-			this.renderTable()
+		// runLots(e) {
+		// 	Timer.start('tot')
+		// 	this.clear(e)
+		// 	this.data.rows = this.buildData(10000)	
+		// 	this.renderTable()
 
-			e.target.blur()
-			Timer.stop('tot')
-		}
+		// 	e.target.blur()
+		// 	Timer.stop('tot')
+		// }
 
 
 		update() {
@@ -209,6 +209,146 @@ Doo.define(
 			}
 		  
 		}
+
+		xdooParse(argDataNode, component)  {
+let Config = Doo.$Config
+			const _getPropertyType = (fld, component) => {
+				if (!fld) {
+					return new FieldType('', undefined)
+				}	
+				fld = fld.trim()
+			
+				let type = Config.TYPE.DEFAULT
+				if (fld.indexOf('(') > -1) {
+					type = Config.TYPE.COMPUTED 
+				 } else { 
+					if (fld.indexOf(".") > 0) {
+						type = Config.TYPE.DEEP
+					} else if (!isNaN(fld)) {
+						type = Config.TYPE.ENUM
+					}
+				}
+			
+				let fieldType = new FieldType(fld, type)
+		
+				//TODO this needs to be scooped	
+				component.visibleColumns.push(fld) 
+				fieldType.parentElem = component.parentElement
+				
+				return fieldType
+			}
+			
+			const  _xAttr =  ['src', 'selected', 'checked',  'disabled', 'readonly']  
+	
+		
+			//TODO remove HTML comments
+			//TODO replace {{}} in <code></code> and <pre></pre> with escaped "\{\{" 
+			//TODO Allow for nested {{templateRoot{{yyy}}zzz}}
+			let tplNode = argDataNode.cloneNode(true)
+			tplNode.removeAttribute(Config.DATA_BIND)
+			//tplNode.removeAttribute('dynamic')
+			let htmlStr = tplNode.outerHTML.replace(/\t/g, '').replace(/\n/g, '')
+			let orgStr = htmlStr
+			//covers checked="false" where browser returns true 
+			//TODO: check modern browser to see if it still is an issue
+			_xAttr.forEach(item => {
+				htmlStr = htmlStr.replace(new RegExp(' ' + item + '="{{(.+)}}"', 'g'), ' doo-' + item + '="{{$1}}"')
+			})
+			let xHtml = (orgStr === htmlStr)
+			// if (window[this.constructor.name] === undefined) {
+			//     window[this.constructor.name] = []
+			// } 
+			//TODO bind(this)
+			// let inst =  window[this.constructor.name].length
+			// htmlStr = htmlStr.split('="doo.self.').join('="' + this.constructor.name + '[' + inst + '].');
+			// htmlStr = htmlStr.split('="self.').join('="' + this.constructor.name + '[' + inst + '].');
+			//TODO allow key with no value
+			// if (this.getAttribute('key')) {
+			// 	htmlStr = htmlStr.split(' key ').join(' key="{{ i() }}" ');
+			// }	
+			let aHTML = htmlStr.split(Config.DELIMITER.END)
+		
+			let templateArray = []
+			let len = aHTML.length
+			let aStr
+		
+			for (let i=0; i<len; i++) {
+				if (Config.DELIMITER.BEG.includes(Config.DELIMITER.BEG)) {
+					aStr =  aHTML[i].split(Config.DELIMITER.BEG)
+					templateArray.push(aStr[0])	
+					templateArray.push(_getPropertyType(aStr[1],component))		
+				}	
+			} 
+			return {templateArray,xHtml}
+		}
+	
+
+		xrenderNode(place, data, start = 0, pgSize = Config.PAGE_SIZE) {
+	 	Timer.start('tot')
+
+if (!data.length) return ''
+			const _getItemValue = (item, prop) => {
+				if (typeof prop === 'function') {
+					return this[prop](item)
+				}
+				let curValue = item
+				try { 
+					prop.split('.').forEach(key => curValue = curValue[key])
+				} catch(e) {
+					console.log('Property not found', prop, JSON.stringify(curValue))
+				}
+				return curValue
+			}
+
+			let y = place.templateArray.length-1
+		const arr = place.templateArray.splice(0,y)
+			let dataLen = data.length
+			,stop = start + pgSize
+			,html = Array((dataLen * y) -1).fill('')
+			,html2 = Array(2).fill(arr.slice(0,y))
+	
+			console.log(arr,html[0], html[1])
+			const initialValue = '';
+
+			if (stop > dataLen) { stop = dataLen }
+			let pointer = 0
+			//for (let i = start; i<stop; i++) {
+			for (let i = start; i<dataLen; i++) {
+
+				for (let j=1 ; j<y; j=j+2) {
+
+					html[pointer + j -1] = arr[j-1]
+					if (arr[j] && arr[j].fld) {
+//						html[pointer + j] = _getItemValue(data[i],arr[j].fld)
+						html[pointer + j] = data[i][arr[j].fld]
+					}	
+					pointer = (i + j)-1
+					    
+				}
+			}
+//			console.log(html[0], html[1])
+//			console.log(html)
+			const x = html.join() 
+
+/*
+			if (stop > dataLen) { stop = dataLen }
+			for (let i = start; i<stop; i++) {
+				for (let j=0, len = place.templateArray.length; j<len; j=j+2) {
+					html.push(place.templateArray[j])
+					if (place.templateArray[j+1] && place.templateArray[j+1].fld) {
+						html.push(_getItemValue(data[i],place.templateArray[j+1].fld))
+					}    
+				}
+			}
+			const x = html.join('') 
+			Timer.stop('tot')
+	
+//			return html.join('')
+*/
+return x //html.join('')
+		}
+		
+
 		addEventListeners() {
 			document.getElementById("main").addEventListener('click', e => {
 				e.preventDefault()
