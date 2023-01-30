@@ -164,73 +164,10 @@ Doo.define(
 		}
 
 		clear(e) {
-			let len = this.data.rows.length
-			if (e && len) {
-				
-				Timer.start('tot')
-				this.tbody.remove()
-				debugger
-				this.dooAfterRender()
-				//textContent = ''
-				// while (this.tbody.lastElementChild) {
-				// 	this.tbody.lastElementChild.remove()
-				// }
-				// let tbody = this.tbody.childNodes
-				// for (let i=len-1;i>=0;--i) {
-				// 	tbody.item(i).remove()
-				// }		
-		
-				e.target.blur()
-				Timer.stop('tot')
-			} else {
-				this.tbody.textContent = ''
-			}
+			this.tbody.textContent = ''
 			this.data.rows = []
 	
 		}
-	/*	
-		renderTable(dataSet=this.data[this.defaultDataSet],target=this.place[0], start=0) {
-//			let elem = document.createElement(target.tagName),len = dataSet.length, i = len - 1
-			let elem = document.createElement(target.tagName),len = dataSet.length //, i = len
-	//		elem.id = 'tbody'
-			elem.innerHTML = this.renderNode(target, dataSet, start , len - start)
-	//		let nodes = document.createTreeWalker(elem,1)
-			let tableRows = elem.querySelectorAll('tr')
-		//	const tr = document.createElement('tr')
-		// do {
-		// 	//	target.insertBefore(elem.content.removeChild(elem.content.lastElementChild), target.firstElementChild).key = dataSet[i].id
-		// 		target.insertBefore(elem.removeChild(elem.lastElementChild), target.firstElementChild).key = dataSet[i].id
-
-		// 	} while ( --i >=0)
-		// 	do {
-		// 		target.appendChild(elem.childNodesinsertBefore(elem.removeChild(elem.lastElementChild), target.firstElementChild).key = dataSet[i].id
-		// 	} while ( --i >=0)
-	
-//debugger
-//target.append(nodes)
-			for (let i=0;i<len; i++) {
-			 	target.appendChild(tableRows.item(i)).key = dataSet[i].id
-			}	
-	//		let node = nodes.root
-		//	do {
-	//			target.append([...nodes.root.childNodes])
-//				this.tbody = target.parentElement.querySelector('#tbody')
-//debugger
-				//target.appendChild(elem.childNodesinsertBefore(elem.removeChild(elem.lastElementChild), target.firstElementChild).key = dataSet[i].id
-		//	} while (node = node.nextNode())
-
-			// 	//let x = 
-			// 	target.appendChild(tableRows.item(i))
-			// 	//x.replaceWith(tableRows.item(i))
-			// }
-			//debugger
-			
-		//	target.parentNode.firstElementChild.replaceWith(elem)
-		//	this.tbody = this.shadow.querySelector('#tbody')
-
-		}
-	
-*/
 		swapRows(e) {
 			if (this.data.rows.length > 998) {
 				Timer.start('tot')
@@ -250,10 +187,6 @@ Doo.define(
 				this.data.rows[998] = row1
 				
 				this.tbody.childNodes[1].replaceWith(node998)
-//debugger
-				// if (node998.classList.contains('danger')) {
-				// 	this.select(this.tbody.childNodes[998])
-				// }  
 				this.tbody.childNodes[998].replaceWith(node1)
 				if (this.tbody.childNodes[998].classList.contains('danger')) {
 					this.selectedRow = this.tbody.childNodes[998]
@@ -263,9 +196,6 @@ Doo.define(
 				}	
 
 
-				// if (node1.classList.contains('danger')) {
-				// 	this.select(this.tbody.childNodes[1])
-				// }	
 				e.target.blur()
 				Timer.stop('tot')
 
@@ -273,103 +203,12 @@ Doo.define(
 			// e.target.blur()
 			// Timer.stop('tot')
 		}
-		/*
-		swapRows(e) {
-			Timer.start('tot')
-
-			if(this.data.rows.length > 998) {
-				const view0 = this.tbody.firstElementChild;
-				const view1 = view0.nextSibling;
-				const view997 = this.tbody.childNodes[998];
-				const view998 = view997.nextSibling;
-					// export function insertAfter(newNode: Element, referenceNode: Element) {
-					// 	if (referenceNode.parentNode) {
-					// 	  referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
-					// 	}
-					//   }
-					//   referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
-					
-				const	row1 = this.data.rows[1]
-				
-					this.data.rows[1] = this.data.rows[998];
-					this.data.rows[998] = row1
-		
-				this.tbody.insertBefore(view998, view0);
-				this.tbody2.parentNode.insertBefore(view1, view997);
-				
-			}
-			e.target.blur()
-			Timer.stop('tot')
-
-		}
-		*/
 		insertAfter(newNode, referenceNode) {
 			if (referenceNode.parentNode) {
 			  referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 			}
 		  
 		}
-/*
-
-		swapRows(e) {
-
-					  Timer.start('tot')
-				//	  let tableRows = this.tbody.querySelectorAll('tr')
-			//		  #tbody > tr.danger
-
-
-					 // #tbody > tr:nth-child(2)
-			if(this.tbody.children.length > 998) {
-				Timer.start('tot')
-				// const view0 = this.tbody.querySelector('tr:nth-child(1)');
-				// const view1 = view0.nextSibling;
-				// const view997 = this.tbody.querySelector('tr:nth-child(997)');
-				// const view998 = view997.nextSibling;
-
-			//	let view0 = this.tbody.firstElementChild,
-				let view1 = this.tbody.firstElementChild.nextSibling,
-				view998 = view997.nextSibling
-			//view997 = this.tbody.childNodes[998],
-	
-
-				// const view0 = tableRows.item(0);
-			//	 let view1 = tableRows.item(1),
-			// view998 = tableRows.item(998);
-
-				// const view997 = tableRows.item(997);
-
-
-				const	row1 = this.data.rows[1]
-				
-				this.data.rows[1] = this.data.rows[998];
-				this.data.rows[998] = row1
-
-		  
-			//   if (
-			// 	view0 &&
-			// 	view1 &&
-			// 	view997 &&
-			// 	view998
-			//   ) {
-
-				this.tbody.insertBefore(view998, view1);
-				this.tbody.insertBefore(view1, view998);
-				//view1.parentNode.insertBefore(view998, view1);
-				//view998.parentNode.insertBefore(view1, view998);
-
-
-	//			this.insertAfter(view998, view0);
-	//			this.insertAfter(view1, view997);
-//			  }
-				e.target.blur()
-				Timer.stop('tot')
-
-			}
-
-		}
-*/		
-
-
 		addEventListeners() {
 			document.getElementById("main").addEventListener('click', e => {
 				e.preventDefault()

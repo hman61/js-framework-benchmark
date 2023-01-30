@@ -1,6 +1,11 @@
 import { memo, useReducer } from 'react';
 import { render } from 'react-dom';
 
+import Doo from './js/DooHTML.js'
+
+//alert(Doo.version)
+
+
 const random = (max) => Math.round(Math.random() * 1000) % max;
 
 const A = ["pretty", "large", "big", "small", "tall", "short", "long", "handsome", "plain", "quaint", "clean",
@@ -24,8 +29,11 @@ const buildData = (count) => {
 
   return data;
 };
+//let dataSet =  buildData(1000)
 
 const initialState = { data: [], selected: 0 };
+
+//let rowData = []
 
 const listReducer = (state, action) => {
   const { data, selected } = state;
@@ -34,7 +42,9 @@ const listReducer = (state, action) => {
     case 'RUN':
       return { data: buildData(1000), selected: 0 };
     case 'RUN_LOTS':
-      return { data: buildData(10000), selected: 0 };
+      dataSet = buildData(10000) 
+      return
+//      return { data: buildData(10000), selected: 0 };
     case 'ADD':
       return { data: data.concat(buildData(1000)), selected };
     case 'UPDATE': {
@@ -49,6 +59,9 @@ const listReducer = (state, action) => {
       return { data: newData, selected };
     }
     case 'CLEAR':
+      alert('coolio')
+      alert(document.getElementById('table').outerHTML)
+      alert(Doo.version)
       return { data: [], selected: 0 };
     case 'SWAP_ROWS':
       return data.length > 998 ? { data: [data[0], data[998], ...data.slice(2, 998), data[1], data[999]], selected } : state;
@@ -110,6 +123,12 @@ const Main = () => {
 
   return (<div className="container">
     <Jumbotron dispatch={dispatch} />
+    {/* <doo-html
+            context="document"
+            link="/css/currentStyle.css"
+            data-bind="dataSet"
+            template="#table"
+    ></doo-html> */}
     <table className="table table-hover table-striped test-data">
       <tbody>
         {data.map(item => (
