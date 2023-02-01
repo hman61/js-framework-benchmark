@@ -4,7 +4,7 @@ export const DooX = {
     function(name, dataSet, instanceName = null) {
         name = this.getDataSetName(name)
         this.dataSet[name] = dataSet
-        this.refresh(name)
+        this.dispatch(name)
 
     },
     'getData':
@@ -68,8 +68,8 @@ export const DooX = {
         const subscriber = doc.querySelectorAll("[data-src='" + name +"']")
         for (let i=0, len=subscriber.length; i<len; i++) {
             console.log('subscriber', subscriber[i].tagName,new Date().getTime())
-            subscriber[i].setAttribute('doo-refresh', new Date().getTime())
-            //await subscriber.item(i).render()
+        //s    subscriber[i].setAttribute('doo-refresh', new Date().getTime())
+            subscriber.item(i).renderTable(this.dataSet[name])
 
         }
     },

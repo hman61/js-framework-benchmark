@@ -1,5 +1,5 @@
-import { memo, useReducer,useEffect, useState } from 'react';
-import { memo, useReducer,useEffect } from 'react';
+//import { memo, useReducer,useEffect} from 'react';
+import { memo, useReducer } from 'react';
 import { render } from 'react-dom';
 
 import DooHTML from './Doo-HTML'
@@ -32,50 +32,9 @@ const buildData = (count) => {
 };
 
 //const initialState = { data: [], selected: 0 };
-const [dooData,setDooData] = useState([])
+//const [dooData,setDooData] = useState([])
 const initialState = { data:[], selected: 0 };
-setDooData([])
-const handleClick = (state, action) => {
-  let retVal = {data:[], selected: 0}
-  setSelected(0)
-
-  switch (action.type) {
-    case 'RUN':
-      setSelected(0)
-      setData(buildData(3))
-      return 
-    case 'RUN_LOTS':
-      setSelected(0)
-      setData(buildData(10000))
-      return
-    case 'ADD':
-      setSelected(0)
-      setData(data.concat(buildData(1000)))
-      return
-    case 'UPDATE': {
-      const newData = data.slice(0),len=newData.length
-      for (let i = 0; i < len; i += 10) {
-        const r = newData[i];
-        newData[i] = { id: r.id, label: r.label + " !!!" };
-      }
-      setData(newData)
-      return
-    }
-    case 'CLEAR':
-      return { data: [], selected: 0 };
-    case 'SWAP_ROWS':
-      return data.length > 998 ? { data: [data[0], data[998], ...data.slice(2, 998), data[1], data[999]], selected } : state;
-    case 'REMOVE': {
-      const idx = data.findIndex((d) => d.id === action.id);
-
-      return { data: [...data.slice(0, idx), ...data.slice(idx + 1)], selected };
-    }
-    case 'SELECT':
-      setSelected(action.id)
-    default:
-      return state;
-  }
-};
+//setDooData([])
 
 
 
@@ -85,7 +44,7 @@ const listReducer = (state, action) => {
     case 'RUN':
       return { data: buildData(1000), selected: 0 }
     case 'RUN_LOTS':
-      return { data: buildData(3), selected: 0 }
+      return { data: buildData(10000), selected: 0 }
     case 'ADD':
       return { data: data.concat(buildData(1000)), selected };
     case 'UPDATE': {
@@ -164,11 +123,12 @@ const Jumbotron = memo(({ dispatch }) => (
     </div>
 ), () => true);
 let ii=0
+//console.log(dooData)
 const Main = () => {
   const [{ data, selected }, dispatch] = useReducer(listReducer, initialState);
-  setDooData(listReducer(data,selected))
-//  DooHTML.DooX.setData('data', dooData)
-  
+//  setDooData(listReducer(data,selected))
+  DooHTML.DooX.setData('data', listReducer(data,selected))
+console.log('goolio', DooHTML.DooX.getData('data')[0])  
   return (<div className="container">
     <Jumbotron dispatch={dispatch} />
     <doo-html
@@ -187,8 +147,8 @@ const Main = () => {
           <Row key={item.id} item={item} selected={selected === item.id} dispatch={dispatch} />
         ))}
       </tbody>
-    </table> */}
-    <span className="preloadicon glyphicon glyphicon-remove" aria-hidden="true" />
+    </table>
+    <span className="preloadicon glyphicon glyphicon-remove" aria-hidden="true" /> */}
   </div>);
 }
 
