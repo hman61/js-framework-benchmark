@@ -31,10 +31,7 @@ const buildData = (count) => {
   return data;
 };
 
-//const initialState = { data: [], selected: 0 };
-//const [dooData,setDooData] = useState([])
 const initialState = { data:[], selected: 0 };
-//setDooData([])
 
 
 
@@ -74,20 +71,20 @@ const listReducer = (state, action) => {
   }
 };
 
-const Row = memo(({ selected, item, dispatch }) => (
-    <tr className={selected ? "danger" : ""}>
-      <td className="col-md-1">{item.id}</td>
-      <td className="col-md-4">
-        <a onClick={() => dispatch({ type: 'SELECT', id: item.id })}>{item.label}</a>
-      </td>
-      <td className="col-md-1">
-        <a onClick={() => dispatch({ type: 'REMOVE', id: item.id })}>
-          <span className="glyphicon glyphicon-remove" aria-hidden="true" />
-        </a>
-      </td>
-      <td className="col-md-6" />
-    </tr>
-), (prevProps, nextProps) => prevProps.selected === nextProps.selected && prevProps.item === nextProps.item)
+// const Row = memo(({ selected, item, dispatch }) => (
+//     <tr className={selected ? "danger" : ""}>
+//       <td className="col-md-1">{item.id}</td>
+//       <td className="col-md-4">
+//         <a onClick={() => dispatch({ type: 'SELECT', id: item.id })}>{item.label}</a>
+//       </td>
+//       <td className="col-md-1">
+//         <a onClick={() => dispatch({ type: 'REMOVE', id: item.id })}>
+//           <span className="glyphicon glyphicon-remove" aria-hidden="true" />
+//         </a>
+//       </td>
+//       <td className="col-md-6" />
+//     </tr>
+// ), (prevProps, nextProps) => prevProps.selected === nextProps.selected && prevProps.item === nextProps.item)
 
 const Button = ({ id, cb, title }) => {
   // useEffect(() => {
@@ -126,10 +123,10 @@ let ii=0
 //console.log(dooData)
 const Main = () => {
   const [{ data, selected }, dispatch] = useReducer(listReducer, initialState);
-//  setDooData(listReducer(data,selected))
-  DooHTML.DooX.setData('data', listReducer(data,selected))
-console.log('goolio', DooHTML.DooX.getData('data')[0])  
-  return (<div className="container">
+  let newData = listReducer(data,selected) || []
+  DooHTML.DooX.setData('data', newData)
+
+return (<div className="container">
     <Jumbotron dispatch={dispatch} />
     <doo-html
             context="shadow"
@@ -138,8 +135,6 @@ console.log('goolio', DooHTML.DooX.getData('data')[0])
             bind="data"
             template="#table"
             data-store="DooHTML.DooX"
-            
-            title={ii++}
     ></doo-html>
     {/* <table className="table table-hover table-striped test-data">
       <tbody>

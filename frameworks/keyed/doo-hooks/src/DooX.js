@@ -67,9 +67,7 @@ export const DooX = {
     async function(name, doc = document) {
         const subscriber = doc.querySelectorAll("[data-src='" + name +"']")
         for (let i=0, len=subscriber.length; i<len; i++) {
-            console.log('subscriber', subscriber[i].tagName,new Date().getTime())
-        //s    subscriber[i].setAttribute('doo-refresh', new Date().getTime())
-            subscriber.item(i).renderTable(this.dataSet[name])
+            subscriber.item(i).render(this.dataSet[name])
 
         }
     },

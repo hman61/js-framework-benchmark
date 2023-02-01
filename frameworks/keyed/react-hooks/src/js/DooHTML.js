@@ -484,7 +484,6 @@ export class Doo {
     }
 
     async render(dataSetName=null, page=0, replaceOrAppendRow=null) {
-        debugger
         if (!this.template) {
             console.log(this.name + ' has no template defined')
             return

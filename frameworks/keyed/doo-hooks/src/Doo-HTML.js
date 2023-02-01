@@ -74,7 +74,7 @@ export class DooHTML extends HTMLElement {
 	//set PAGE_SIZE(pageSize) {this.PAGE_SIZE = pageSize }  // remove handled by props
 
 	static get observedAttributes() {
-		return ['doo-dispatch','doo-refresh','data-src','data-key','data-template','bind', 'data-page', 'data-page-size', 'page-size']
+		return ['doo-refresh','data-src','data-key','data-template','bind', 'data-page', 'data-page-size', 'page-size']
 	}
 
 	async attributeChangedCallback(name, oldVal, newVal) {
@@ -85,10 +85,10 @@ export class DooHTML extends HTMLElement {
 				await this.render(DooHTML.DooX.getData(this.getAttribute('bind')))
 			} else if (name === 'data-use-state') {
 				//doo noting yet
-			} else if (name ==="doo-dispatch") {
-				console.log('coolio',(this.getAttribute('bind')))
+			// } else if (name ==="doo-dispatch") {
+			// 	console.log('coolio',(this.getAttribute('bind')))
 
-				await this.render(DooHTML.DooX.getData(this.dataset.src))
+			// 	await this.render(DooHTML.DooX.getData(this.dataset.src))
 			} else if (name === 'data-store') {
 				// let dao = window[this.dataset.store]
 				// console.log(dao)
@@ -352,7 +352,6 @@ export class DooHTML extends HTMLElement {
 		let dataLen = data.length
 		,stop = start + pgSize
 		,html = []
-console.log('coolio', this.place)
 		if (stop > dataLen) { stop = dataLen }
 		for (let i = start; i<stop; i++) {
 			for (let j=0, len = place.templateArray.length; j<len; j=j+2) {
@@ -381,8 +380,12 @@ console.log('coolio', this.place)
 		}	
 	}
 	renderTable(dataSet=this.data[this.defaultDataSet],target=this.place[0], start=0) {
-		console.log('roolio', this.dataSet)
 		let elem = document.createElement('template'),len = dataSet.length, i = len - 1
+		if (len === 0) {
+			target.textContent = ''
+			this.showComponentContainer()
+			return
+		}
 		elem.innerHTML = this.renderNode(target, dataSet, start , len - start)
 		do {
 			target.insertBefore(elem.content.removeChild(elem.content.lastElementChild), target.firstElementChild).key = dataSet[i].id
@@ -400,13 +403,22 @@ console.log('coolio', this.place)
 
 	render(dataSetName=null, page=0, replaceOrAppendRow=null)  {
 		if (!this.template) {
-			console.log(this.name + ' has no template defined')
+			console.error(this.name + ' has no template defined')
+			console.log('You need to set a data-template attribute on the <doo-html /> component')
+			console.log('You can referense you data-template by a template id')
+			console.log('Example: <doo-html data-template="#t1" .../>')
+			console.log('Templates can also be external and you can use reletive path to access it')
+			console.log('Example: <doo-html data-template="./templates/t1.html" .../>')
 			return
 		} 
 		if (!this.place) {
+			//TODO make the root the default
 			console.log('No target set on the component or inside the template. USAGE: set the bind=dataKey or data-src=data-key')
 		}
 		for (let i=0, len=this.place.length;i<len;i++) {
+			if (this.place[i].tagName === 'TR' || this.place[i].tagName === 'TBODY' || this.place[i].tagName === 'TABLE') {
+				this.renderTable(dataSetName, this.place[i], page )
+			}  
 			if (dataSetName && dataSetName !== this.place[i].dataKey) {
 				continue   // TODO other for-eachs that are children of the specified data set proably needs to be re-rendered (needs test scenarios)
 			}
@@ -449,10 +461,13 @@ console.log('coolio', this.place)
 		this.templateElem = this.templateNode.content
 		this.initReactiveDataNodes(this.templateNode)
 		this.setContext()
+		
 		if (typeof this.dooAfterRender === 'function') {
 			await this.dooAfterRender()
 		}
-		this.setAttribute('doo-refresh', new Date().getTime())
+		// TODO make sure that this is safe
+		this.renderTable([],this.place[0])
+		//this.setAttribute('doo-refresh', new Date().getTime())
 		// if (typeof this.dooAfterRender === 'function') {
 		// 	this.setAttribute('doo-after-render', 'dooAfterRender')
 		// }
