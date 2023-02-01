@@ -1,141 +1,6 @@
-/******/ (() => { // webpackBootstrap
-/******/ 	"use strict";
-var __webpack_exports__ = {};
-
-// UNUSED EXPORTS: DooHTML, default
-
-;// CONCATENATED MODULE: ./src/js/Doo-Config.js
-class DooConfig {
-    static DATA_BIND ='bind'
-    static TEMPLATE_EXT = '.html'
-    static COMPONENT_DIR = '/components'
-    static NAME ='DooHTML'
-    static TYPE = {DEFAULT:0,ENUM:1,DEEP:2,COMPUTED:3 }
-    static MATCH = {ANY:-1,STARTS_WITH:0,EXACT:1}
-    static DELIMITER = {'BEG':'{{','END':'}}'}
-    static DOCUMENT =  'document'
-    static SHADOW = 'shadow'
-    static FLEX_BODY = '.fbody'	
-    static PAGE_SIZE = 12
-    static DATA_STORE='data-store'
-    static DATA_KEY='data-key'
-    static DATA_SCROLL_CONTAINER='.fbody'
-    static DATA_SCROLL_HEADER='.fhead'
-
-
-}
-;// CONCATENATED MODULE: ./src/js/DooX.js
-const DooX = {
-    'dataSet':{},
-    'setData': 
-    function(name, dataSet, instanceName = null) {
-        name = this.getDataSetName(name)
-        this.dataSet[name] = dataSet
-        this.refresh(name)
-
-    },
-    'getData':
-    function(name)  {	
-        name = this.getDataSetName(name)
-        return this.dataSet[name]
-    },		
-    'getDataSetName':
-    function(name)  {
-        if (name && typeof name === 'object') {
-            name = Doo.getDataBind(name)
-        }
-        if (!name) {
-            console.log('No dataSet name specified.')
-            return null
-        } else {	
-            if (!this.dataSet[name]) {
-                this.dataSet[name] = []
-            }
-        }	
-        return name
-    },	
-    'prepend':
-    function(name, obj) {
-        name = this.getDataSetName(name)	
-        this.append(name, obj, true)
-    },	
-    
-    'append':
-    async function(name, obj, top = null) {
-        //TODO this can all be done with splice
-        if (Array.isArray(obj)) {
-            this.dataSet[name] = top ? obj.concat(Doo.DAO.getData(name)) : Doo.DAO.getData(name).concat(obj) 
-        } else {
-            name = this.getDataSetName(name) 
-            // if (!this.dataSet[name]) {
-            // 	this.dataSet[name] = []
-            // }
-            if (top) {
-                Doo.DAO.getData(name).splice(0, 0, obj) 
-            } else {
-                Doo.DAO.getData(name).push(obj)
-            } 	
-        }
-        this.refresh(name)
-    },
-    'update':
-    function(name, obj, idx) {
-        name = this.getDataSetName(name)	
-        Doo.DAO.getData(name).splice(idx,1,obj)
-        this.refresh(name)
-    },
-    'remove': 
-    function(name, idx) {
-        name = this.getDataSetName(name)	
-        Doo.DAO.getData(name).splice(idx,1)
-        this.refresh(name)
-    },
-    'dispatch':
-    async function(name, doc = document) {
-        const subscriber = doc.querySelectorAll("[data-src='" + name +"']")
-        for (let i=0, len=subscriber.length; i<len; i++) {
-            subscriber[i].setAttribute('doo-refresh', new Date().getTime())
-        }
-    },
-
-    'refresh':
-    async function(name, doc = document) {
-        const subscriber = doc.querySelectorAll("[doo-dispatch='" + name +"']")
-        for (let i=0, len=subscriber.length; i<len; i++) {
-            await subscriber.item(i).render()
-        }
-    },
-    'csvToJson':
-    function(csvText) {
-        let rows = csvText.split("\n")
-        let data = []
-        if (rows !== undefined) {
-            let rowsLen = rows.length
-            let fieldDesc = rows[0].replace(/\r/g, '')
-            let cols = fieldDesc.split(",")
-            let colLen = cols.length
-
-            if (rows.length > 1) {
-                let re = new RegExp('(,)(?=(?:[^"]|"[^"]*")*$)','g')
-                for (let i=1;i<rowsLen-1;i++) {
-                    let obj={}
-                    let rowStr = rows[i].replace(re, '|^|') + '|^|'	
-                    let row = rowStr.split('|^|')
-                    for (let j=0;j<colLen;j++) {
-                        obj[cols[j]] = (row[j]) ? row[j].replace(/"/g, '').trim() : ''
-                    }	
-                    data.push(obj)
-                }	
-            }
-        }
-        return data
-    }
-}
-/* harmony default export */ const js_DooX = (DooX);
-;// CONCATENATED MODULE: ./src/js/Doo-Html.js
-
+import Config from './Doo-Config'
 //import Doo from './doo.html'
-
+import DooX from './DooX'
 //import {  createDooTemplate } from './Doo-Template'
 
 class FieldType {
@@ -150,7 +15,7 @@ class FieldType {
 		this.$4 = undefined
 		this.$5 = undefined
 
-		if (this.type === DooConfig.TYPE.COMPUTED) { 
+		if (this.type === Config.TYPE.COMPUTED) { 
 			this.createComputed()
 		}	
 	}
@@ -190,7 +55,7 @@ class FieldType {
 
 
 
-class DooHTML extends HTMLElement {
+export class DooHTML extends HTMLElement {
 	static DAO = DooHTML.DAO
 	static get version() {return 'v0.90.1b'}
 
@@ -198,7 +63,7 @@ class DooHTML extends HTMLElement {
 		let name = alias || klass.name.toLowerCase()
 		customElements.define('doo-' + name, klass)
 	}	
-	constructor(pageSize=DooConfig.PAGE_SIZE) {
+	constructor(pageSize=Config.PAGE_SIZE) {
 		super()
 		this.PAGE_SIZE = pageSize	
 		this.data = {}
@@ -209,25 +74,21 @@ class DooHTML extends HTMLElement {
 	//set PAGE_SIZE(pageSize) {this.PAGE_SIZE = pageSize }  // remove handled by props
 
 	static get observedAttributes() {
-		return ['doo-refresh','data-key','data-template','bind', 'data-page', 'data-page-size', 'page-size']
+		return ['doo-dispatch','doo-refresh','data-src','data-key','data-template','bind', 'data-page', 'data-page-size', 'page-size']
 	}
-
-	// static get observedAttributes() {
-	// 	//		return ['doo-refresh','key','doo-foreach','orientation','doo-dao', 'data-src','implements','doo-db-update','doo-db','doo-theme', Doo.$Config.DATA_BIND,'index','page-size','debug']
-	// 			return ['doo-after-render','data-name','data-store','data-doo-refresh','data-use-state','doo-refresh','key','doo-foreach','orientation','doo-dao', 'doo-db-update','doo-db','page-size','debug']
-	// 		}
-
 
 	async attributeChangedCallback(name, oldVal, newVal) {
 		
 		//TODO do we need length???
 		if (newVal.length > 0 && oldVal !== newVal) {
-			if (name === 'doo-refresh' && this.dataset.useState) {
-				await this.render(this.dataset.useState)
+			if (name === 'doo-refresh' && this.dataset.store) {
+				await this.render(DooHTML.DooX.getData(this.getAttribute('bind')))
 			} else if (name === 'data-use-state') {
 				//doo noting yet
-			} else if (name ==="doo-refresh") {
-				await this.render()
+			} else if (name ==="doo-dispatch") {
+				console.log('coolio',(this.getAttribute('bind')))
+
+				await this.render(DooHTML.DooX.getData(this.dataset.src))
 			} else if (name === 'data-store') {
 				// let dao = window[this.dataset.store]
 				// console.log(dao)
@@ -250,14 +111,14 @@ class DooHTML extends HTMLElement {
 			}	
 			fld = fld.trim()
 		
-			let type = DooConfig.TYPE.DEFAULT
+			let type = Config.TYPE.DEFAULT
 			if (fld.indexOf('(') > -1) {
-				type = DooConfig.TYPE.COMPUTED 
+				type = Config.TYPE.COMPUTED 
 			 } else { 
 				if (fld.indexOf(".") > 0) {
-					type = DooConfig.TYPE.DEEP
+					type = Config.TYPE.DEEP
 				} else if (!isNaN(fld)) {
-					type = DooConfig.TYPE.ENUM
+					type = Config.TYPE.ENUM
 				}
 			}
 		
@@ -277,7 +138,7 @@ class DooHTML extends HTMLElement {
 		//TODO replace {{}} in <code></code> and <pre></pre> with escaped "\{\{" 
 		//TODO Allow for nested {{templateRoot{{yyy}}zzz}}
 		let tplNode = argDataNode.cloneNode(true)
-		tplNode.removeAttribute(DooConfig.DATA_BIND)
+		tplNode.removeAttribute(Config.DATA_BIND)
 		//tplNode.removeAttribute('dynamic')
 		let htmlStr = tplNode.outerHTML.replace(/\t/g, '').replace(/\n/g, '')
 		let orgStr = htmlStr
@@ -298,15 +159,15 @@ class DooHTML extends HTMLElement {
 		// if (this.getAttribute('key')) {
 		// 	htmlStr = htmlStr.split(' key ').join(' key="{{ i() }}" ');
 		// }	
-		let aHTML = htmlStr.split(DooConfig.DELIMITER.END)
+		let aHTML = htmlStr.split(Config.DELIMITER.END)
 	
 		let templateArray = []
 		let len = aHTML.length
 		let aStr
 	
 		for (let i=0; i<len; i++) {
-			if (DooConfig.DELIMITER.BEG.includes(DooConfig.DELIMITER.BEG)) {
-				aStr =  aHTML[i].split(DooConfig.DELIMITER.BEG)
+			if (Config.DELIMITER.BEG.includes(Config.DELIMITER.BEG)) {
+				aStr =  aHTML[i].split(Config.DELIMITER.BEG)
 				templateArray.push(aStr[0])	
 				if (aStr[1]) {
 					templateArray.push(_getPropertyType(aStr[1],component))		
@@ -330,7 +191,7 @@ class DooHTML extends HTMLElement {
 		this.flex = null
 		if (this.hasAttribute('data-map')) {
 			if (this.getAttribute('data-map').indexOf('Doo.reflect') === 0) {
-				this.dataMap = Reflect.ownKeys(js_DooX.getData(this.getAttribute(DooConfig.DATA_BIND))[0])
+				this.dataMap = Reflect.ownKeys(DooX.getData(this.getAttribute(Config.DATA_BIND))[0])
 			} else {	
 				this.dataMap = this.getAttribute('data-map').split('|')
 			}
@@ -344,7 +205,7 @@ class DooHTML extends HTMLElement {
 				return this.hasAttribute(p1) ? this.getAttribute(p1) : 
 						tplNode.hasAttribute(p1) ? tplNode.getAttribute(p1) : '';
 			} else if (this.dataMap.length > 0) {
-				return DooConfig.DELIMITER.BEG + this.dataMap[p1-1] + DooConfig.DELIMITER.END 
+				return Config.DELIMITER.BEG + this.dataMap[p1-1] + Config.DELIMITER.END 
 			}	
 		}
 
@@ -372,7 +233,7 @@ class DooHTML extends HTMLElement {
 		}
 
 		tplNode.innerHTML = tplNode.innerHTML.replace(/\$\{(.+?)\}/gm, replacer)
-		let dSrc = tplNode.content.querySelectorAll('[' +  DooConfig.DATA_BIND + ']');
+		let dSrc = tplNode.content.querySelectorAll('[' +  Config.DATA_BIND + ']');
 		[...dSrc].forEach( reactNode  =>  {
 			if (!reactNode.hasAttribute('data-src')) {
 				let dataSrc = this.hasAttribute('doo-dispatch') ? 'DooX' : 'this.data' 
@@ -384,7 +245,7 @@ class DooHTML extends HTMLElement {
 		let i = 0
 		let reactiveElem = [], dataElem, dataSet
 		for (i=0;i<len;i++) {
-			let key = reactiveElems[i].getAttribute(DooConfig.DATA_BIND)  
+			let key = reactiveElems[i].getAttribute(Config.DATA_BIND)  
 			let dataSrc = reactiveElems[i].getAttribute('data-src')
 			if (dataSrc) {
 //				if (dataSrc === 'DooX') {
@@ -417,13 +278,13 @@ class DooHTML extends HTMLElement {
 		for (i=0;i<len;i++) {
 			if ('|STYLE|LINK|'.indexOf(`|${reactiveElem[i].tagName}|`) > -1) {
 				dataElem = reactiveElem[i]
-			} else if (reactiveElem[i].parentElement && (reactiveElems[i].getAttribute(DooConfig.DATA_BIND) === 'void' ||  '|DL|UL|TBODY|THEAD|TFOOT|TR|SELECT|SECTION|'.indexOf(`|${reactiveElem[i].parentElement.tagName}|`) >-1)) {
+			} else if (reactiveElem[i].parentElement && (reactiveElems[i].getAttribute(Config.DATA_BIND) === 'void' ||  '|DL|UL|TBODY|THEAD|TFOOT|TR|SELECT|SECTION|'.indexOf(`|${reactiveElem[i].parentElement.tagName}|`) >-1)) {
 				//TODO remove slots or elem with doo-static attribute, and put as first child after render 
 				dataElem = reactiveElem[i].parentElement
 			} else {
 				dataElem = document.createElement('data')	
 			}
-			dataElem.dataKey = reactiveElem[i].getAttribute(DooConfig.DATA_BIND)
+			dataElem.dataKey = reactiveElem[i].getAttribute(Config.DATA_BIND)
 			let parsedNode = this.dooParse(reactiveElem[i], this,  this.dataMap)
 			dataElem.templateArray = parsedNode.templateArray 	
 			dataElem.xHtml = parsedNode.xHtml 	
@@ -456,8 +317,8 @@ class DooHTML extends HTMLElement {
 				this.removeChild(this.getElementsByTagName('template').item(0))
 			}	
 		}	
-		let context = this.getAttribute('context') || DooConfig.SHADOW 
-		if (context === DooConfig.SHADOW) {
+		let context = this.getAttribute('context') || Config.SHADOW 
+		if (context === Config.SHADOW) {
 			this.componentContainer = this.shadow.host
 			this.showComponentContainer(false)
 			let currentClasses = this.templateElem.firstElementChild.hasAttribute('class') ? ' ' + this.templateElem.firstElementChild.getAttribute('class') : ''
@@ -466,7 +327,7 @@ class DooHTML extends HTMLElement {
 				this.templateElem.firstElementChild.setAttribute('class', `${parentClasses}${currentClasses}`)
 			}
 			this.shadow.appendChild(this.templateElem)
-		} else if (context === DooConfig.DOCUMENT) {
+		} else if (context === Config.DOCUMENT) {
 			this.componentContainer = this.parentElement
 			this.showComponentContainer(false)
 			this.componentContainer.replaceChild(this.templateElem, this)
@@ -474,7 +335,7 @@ class DooHTML extends HTMLElement {
 		this.initialHeight = this.shadow.firstElementChild.offsetHeight
 	}
 
-	renderNode(place, data, start = 0, pgSize = DooConfig.PAGE_SIZE) {
+	renderNode(place, data, start = 0, pgSize = Config.PAGE_SIZE) {
 		const _getItemValue = (item, prop) => {
 			if (typeof prop === 'function') {
 				return this[prop](item)
@@ -491,7 +352,7 @@ class DooHTML extends HTMLElement {
 		let dataLen = data.length
 		,stop = start + pgSize
 		,html = []
-
+console.log('coolio', this.place)
 		if (stop > dataLen) { stop = dataLen }
 		for (let i = start; i<stop; i++) {
 			for (let j=0, len = place.templateArray.length; j<len; j=j+2) {
@@ -515,10 +376,12 @@ class DooHTML extends HTMLElement {
 
 
 	showComponentContainer(show=true) {
-		this.componentContainer.style.visibility = show ? 'visible' : 'hidden'
-
+		if (this.componentContainer) {
+			this.componentContainer.style.visibility = show ? 'visible' : 'hidden'
+		}	
 	}
 	renderTable(dataSet=this.data[this.defaultDataSet],target=this.place[0], start=0) {
+		console.log('roolio', this.dataSet)
 		let elem = document.createElement('template'),len = dataSet.length, i = len - 1
 		elem.innerHTML = this.renderNode(target, dataSet, start , len - start)
 		do {
@@ -548,7 +411,7 @@ class DooHTML extends HTMLElement {
 				continue   // TODO other for-eachs that are children of the specified data set proably needs to be re-rendered (needs test scenarios)
 			}
 			if (page === 0 && this.place[i].tagName !== 'STYLE' && !this.place[i].classList.contains('fhead')) {
-				let pg = this.place[i].getAttribute(DooConfig.DATA_BIND) === 'dummy' ? -1 : 0 
+				let pg = this.place[i].getAttribute(Config.DATA_BIND) === 'dummy' ? -1 : 0 
 				this.place[i].setAttribute("page", pg);
 			}	
 			let dataKey = this.place[i].dataKey
@@ -568,8 +431,8 @@ class DooHTML extends HTMLElement {
 		return page	
 	}
 	async connectedCallback() {
-		let context = this.getAttribute('context') || DooConfig.SHADOW 
-		this.shadow = context === DooConfig.SHADOW ? this.attachShadow({mode: 'open'}) : document
+		let context = this.getAttribute('context') || Config.SHADOW 
+		this.shadow = context === Config.SHADOW ? this.attachShadow({mode: 'open'}) : document
 		if (!this.defaultDataSet && this.getAttribute('bind')) {
 			this.defaultDataSet = this.getAttribute('bind')
 			//this.scrollTarget = Config.FLEX_BODY
@@ -589,6 +452,7 @@ class DooHTML extends HTMLElement {
 		if (typeof this.dooAfterRender === 'function') {
 			await this.dooAfterRender()
 		}
+		this.setAttribute('doo-refresh', new Date().getTime())
 		// if (typeof this.dooAfterRender === 'function') {
 		// 	this.setAttribute('doo-after-render', 'dooAfterRender')
 		// }
@@ -655,16 +519,13 @@ class DooHTML extends HTMLElement {
 
 }	
 if (!window.DooHTML) {
-	DooHTML.DooX = js_DooX
-	DooHTML.Config = DooConfig
+	DooHTML.DooX = DooX
+	DooHTML.Config = Config
 	window.Doo = DooHTML
 	window.DooHTML = DooHTML
 }	
 		
 DooHTML.define(DooHTML,'html')
 
-/* harmony default export */ const Doo_Html = ((/* unused pure expression or super */ null && (DooHTML))); 
+export default DooHTML 
 
-
-/******/ })()
-;

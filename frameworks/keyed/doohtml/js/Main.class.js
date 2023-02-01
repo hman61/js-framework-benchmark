@@ -129,15 +129,15 @@ Doo.define(
 			this.data.rows = this.buildData(10000)
 			this.renderTable(this.data.rows, this.tbody)
 		}
-		// runLots(e) {
-		// 	Timer.start('tot')
-		// 	this.clear(e)
-		// 	this.data.rows = this.buildData(10000)	
-		// 	this.renderTable()
+		runLots(e) {
+			Timer.start('tot')
+			this.clear()
+			this.data.rows = this.buildData(10000)	
+			this.renderTable()
 
-		// 	e.target.blur()
-		// 	Timer.stop('tot')
-		// }
+			e.target.blur()
+			Timer.stop('tot')
+		}
 
 
 		update() {
@@ -209,13 +209,131 @@ Doo.define(
 			}
 		  
 		}
+		xrenderNode(place, data, start = 0, pgSize = Config.PAGE_SIZE) {
+			const _getItemValue = (item, prop) => {
+				if (typeof prop === 'function') {
+					return this[prop](item)
+				}
+				let curValue = item
+				try { 
+					prop.split('.').forEach(key => curValue = curValue[key])
+				} catch(e) {
+					console.log('Property not found', prop, JSON.stringify(curValue))
+				}
+				return curValue
+			}
+			Timer.start('tot')
+
+			let dataLen = data.length
+			,stop = start + pgSize
+			,html = ''
+			,placeLen = place.templateArray.length-1
+			,j=0
+			if (stop > dataLen) { stop = dataLen }
+			for (let i = start; i<stop; i++) {
+				for (j=0; j<placeLen; j=j+2) {
+					//html.push(place.templateArray[j])
+					html += place.templateArray[j]
+					if (place.templateArray[j+1] && place.templateArray[j+1].fld) {
+					//html.push(_getItemValue(data[i],place.templateArray[j+1].fld))
+					//html.push(_getItemValue(data[i],place.templateArray[j+1].fld))
+					html += _getItemValue(data[i],place.templateArray[j+1].fld)
+					}    
+				}
+			}
+			//const x = html.flat().join('')
+			Timer.stop('tot')
+
+			return html
+			//return html.join('')
+		}
+		
 
 	
+		xrenderNode(place, data, start = 0, pgSize = Config.PAGE_SIZE) {
+			const _getItemValue = (item, prop) => {
+				if (typeof prop === 'function') {
+					return this[prop](item)
+				}
+				let curValue = item
+				try { 
+					prop.split('.').forEach(key => curValue = curValue[key])
+				} catch(e) {
+					console.log('Property not found', prop, JSON.stringify(curValue))
+				}
+				return curValue
+			}
+			Timer.start('tot')
+
+			let pointer = start
+			
+			const val = (j, pointer) => data[pointer][place.templateArray[j].fld]
+			
+
+			let dataLen = data.length
+			,stop = start + pgSize
+			,y = place.templateArray.length
+			,arr = place.templateArray.slice()
+			arr[1] = val.call(this, 1,++pointer)
+			arr[3] = val.call(this, 3, pointer)
+
+			let html = Array(dataLen * y).fill(arr)
+			let htmlLen = html.length
+			// if (stop > dataLen) { stop = dataLen }
+			// for (let i = 0; i<htmlLen; i = i+y) {
+			// 	for (let j=1; j<y; j=j+2) {
+			// 		if (place.templateArray[j] && place.templateArray[j].fld) {
+			// 			//html[i + j] = _getItemValue(data[i],place.templateArray[j].fld)
+			// 			html[i + j] = data[i][place.templateArray[j].fld]
+			// 		}    
+			// 	}
+			// }
+		//	console.log(html[0],html[1], html[2],html[3])
+			const x = html.flat().join('')
+			Timer.stop('tot')
+
+			return x
+			//return html.join('')
+		}
+		xrenderNode(place, data, start = 0, pgSize = this.PAGE_SIZE) {
+			Timer.start('tot')
+			const _getItemValue = (item, prop) => {
+				if (typeof prop === 'function') {
+					return this[prop](item)
+				}
+				let curValue = item
+				try { 
+					prop.split('.').forEach(key => curValue = curValue[key])
+				} catch(e) {
+					console.log('Property not found', prop, JSON.stringify(curValue))
+				}
+				return curValue
+			}
+			let dataLen = data.length
+			,stop = start + pgSize
+			,html = []
+			,j=1
+			,placeLen = place.templateArray.length
+			place.templateArray.length
+			if (stop > dataLen) { stop = dataLen }
+		
+			for (let i = start; i<stop; i++) {
+				for (j=1; j<placeLen; j=j+2) {
+					html.push(place.templateArray[j-1])
+					html.push(_getItemValue(data[i],place.templateArray[j].fld))
+				}
+			}
+			let x = html.join('') 
+			Timer.stop('tot')
+	
+			return x //html.join('')
+		}
+	
+
 
 		xrenderNode(place, data, start = 0, pgSize = Config.PAGE_SIZE) {
 	 	Timer.start('tot')
 
-if (!data.length) return ''
 			const _getItemValue = (item, prop) => {
 				if (typeof prop === 'function') {
 					return this[prop](item)
@@ -230,7 +348,7 @@ if (!data.length) return ''
 			}
 
 			let y = place.templateArray.length-1
-		const arr = place.templateArray.splice(0,y)
+		const arr = place.templateArray.splice()
 			let dataLen = data.length
 			,stop = start + pgSize
 			,html = Array((dataLen * y) -1).fill('')
@@ -255,9 +373,9 @@ if (!data.length) return ''
 					    
 				}
 			}
-//			console.log(html[0], html[1])
-//			console.log(html)
-			const x = html.join() 
+			console.log(html[0], html[1])
+			console.log(html)
+			const x = html.join('') 
 
 /*
 			if (stop > dataLen) { stop = dataLen }
@@ -270,10 +388,11 @@ if (!data.length) return ''
 				}
 			}
 			const x = html.join('') 
-			Timer.stop('tot')
 	
 //			return html.join('')
 */
+Timer.stop('tot')
+
 return x //html.join('')
 		}
 		
