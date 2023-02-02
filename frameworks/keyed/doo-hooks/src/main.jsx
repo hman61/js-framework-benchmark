@@ -2,6 +2,7 @@ import { memo, useReducer,useEffect} from 'react';
 //import { memo, useReducer } from 'react';
 import { render } from 'react-dom';
 import DooHTML from './Doo-HTML'
+//import Timer from './doo.timer'
 
 const random = (max) => Math.round(Math.random() * 1000) % max;
 
@@ -131,7 +132,9 @@ const Main = () => {
 
 
   useEffect(() => {
+//    Timer.start('tot')
     Doo.X.setData('data', listReducer(data,selected))
+
   },[listReducer(data,selected)])  
 return (<div className="container">
     <Jumbotron dispatch={dispatch} />

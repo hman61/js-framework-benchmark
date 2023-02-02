@@ -26,8 +26,7 @@ export const DooX = {
     },	
     'prepend':
     function(name, obj) {
-        name = this.getDataSetName(name)	
-        this.append(name, obj, true)
+        DooX.append(name, obj, true)
     },	
     
     'append':
@@ -41,18 +40,17 @@ export const DooX = {
             // 	this.dataSet[name] = []
             // }
             if (top) {
-                Doo.DAO.getData(name).splice(0, 0, obj) 
+                DooX.getData(name).splice(0, 0, obj) 
             } else {
-                Doo.DAO.getData(name).push(obj)
+                DooX.getData(name).push(obj)
             } 	
         }
         this.refresh(name)
     },
     'update':
     function(name, obj, idx) {
-        name = this.getDataSetName(name)	
-        Doo.DAO.getData(name).splice(idx,1,obj)
-        this.refresh(name)
+        DooX.getData(name).splice(idx,1,obj)
+        DooX.refresh(name, idx)
     },
 
 	'deleteNode': (dataSetName, elem) => {
@@ -61,7 +59,8 @@ export const DooX = {
 		} while (elem.dataset.bind !== dataSetName)
         // TODO don't try runing while previousSibling instead
 		let idx =  DooX.getData(dataSetName).findIndex((item, i) => {
-            if (item.id == elem.id) return i  // important do not use ===
+            console.log(elem.key, elem.id, item.id, i)
+            if (Number(elem.id) === Number(elem.id)) return i  
         })
         if (idx > -1) {
             DooX.remove(dataSetName, idx, false)
@@ -87,12 +86,12 @@ export const DooX = {
     },
 
     'refresh':
-    async function(name, doc = document) {
+    async function(name, idx=null,doc = document) {
 //        const subscriber = doc.querySelectorAll("[doo-dispatch='" + name +"']")
         const subscriber = doc.querySelectorAll("[doo-dispatch='" + name +"']")
         for (let i=0, len=subscriber.length; i<len; i++) {
             subscriber[i].setAttribute('doo-refresh', new Date().getTime())
-            await subscriber.item(i).render()
+            await subscriber.item(i).render(subscriber.item(i).dataset.bind,null,null,idx)
         }
     },
 

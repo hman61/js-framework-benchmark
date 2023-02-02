@@ -1,6 +1,7 @@
 import Config from './Doo-Config'
 //import Doo from './doo.html'
 import X from './Doo-X'
+//import Timer from './doo.timer'
 //import {  createDooTemplate } from './Doo-Template'
 
 class FieldType {
@@ -139,6 +140,8 @@ export class DooHTML extends HTMLElement {
 		//TODO Allow for nested {{templateRoot{{yyy}}zzz}}
 		let tplNode = argDataNode.cloneNode(true)
 		tplNode.removeAttribute(Config.DATA_BIND)
+		//tplNode.removeAttribute('data-bind')  //TODO remove from lower places
+		tplNode.removeAttribute('data-key')
 		//tplNode.removeAttribute('dynamic')
 		let htmlStr = tplNode.outerHTML.replace(/\t/g, '').replace(/\n/g, '')
 		let orgStr = htmlStr
@@ -348,20 +351,27 @@ export class DooHTML extends HTMLElement {
 			}
 			return curValue
 		}
-	
 		let dataLen = data.length
 		,stop = start + pgSize
 		,html = []
+		,placeLen = place.templateArray.length
+		,j=0
+		const node1 = document.createElement('tbody')
+		this.place[0].textContent = ''
 		if (stop > dataLen) { stop = dataLen }
 		for (let i = start; i<stop; i++) {
-			for (let j=0, len = place.templateArray.length; j<len; j=j+2) {
+			for (j=0; j<placeLen; j=j+2) {
 				html.push(place.templateArray[j])
-				if (place.templateArray[j+1] && place.templateArray[j+1].fld) {
+				if (typeof place.templateArray[j+1] === 'object') {
 					html.push(_getItemValue(data[i],place.templateArray[j+1].fld))
-				}    
+				}	
 			}
+			node1.innerHTML = html.join('')
+
+			html = []
+			this.place[0].appendChild(node1.firstElementChild).key = i
+
 		}
-		return html.join('')
 	}
  
 	// _highlight(val, filterVal)  {
@@ -386,10 +396,11 @@ export class DooHTML extends HTMLElement {
 			this.showComponentContainer()
 			return
 		}
-		elem.innerHTML = this.renderNode(target, dataSet, start , len - start)
-		do {
-			target.insertBefore(elem.content.removeChild(elem.content.lastElementChild), target.firstElementChild).key = dataSet[i].id
-		} while ( --i >=0)
+//		target.innerHTML = this.renderNode(target, dataSet, start , len - start)
+		this.renderNode(target, dataSet, start , len - start)
+		// do {
+		// 	target.insertBefore(elem.content.removeChild(elem.content.lastElementChild), target.firstElementChild).key = dataSet[i].id
+		// } while ( --i >=0)
 		this.showComponentContainer()
 	}
 	append(dataSet=this.data[this.defaultDataSet],target=this.place[0], start=0) {
@@ -400,16 +411,10 @@ export class DooHTML extends HTMLElement {
 		}
 		this.showComponentContainer()
 	}	
-	removeChild(dataSetName, node) {
-		alert(node)
-		let tr = walkUpToRenderedChild(node)
-alert(tr)
-	}
 	walkUpToRenderedChild(node) {
 		do  {
 			node = node.parentNode
 		} while (node.parentNode !== this.place[0])
-		console.log(node.getAttribute('key'))
 		return node		
 	}
 

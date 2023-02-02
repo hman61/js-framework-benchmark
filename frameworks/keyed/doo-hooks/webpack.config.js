@@ -9,7 +9,7 @@ module.exports = {
 		main: path.join(__dirname, 'src', 'main.jsx'),
 	},
     optimization: {
-        minimize: false
+        //minimize: false
     },	
 	output: {
 		path: path.join(__dirname, 'dist'),
@@ -36,6 +36,7 @@ module.exports = {
 		}]		
 	},
 	optimization: {
+	//	minimize: false
 		minimizer: [
 			new TerserPlugin({
 				terserOptions: {
