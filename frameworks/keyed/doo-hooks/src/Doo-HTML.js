@@ -1,6 +1,6 @@
 import Config from './Doo-Config'
 //import Doo from './doo.html'
-import DooX from './DooX'
+import X from './Doo-X'
 //import {  createDooTemplate } from './Doo-Template'
 
 class FieldType {
@@ -56,8 +56,8 @@ class FieldType {
 
 
 export class DooHTML extends HTMLElement {
-	static DAO = DooHTML.DAO
-	static get version() {return 'v0.90.1b'}
+//	static DAO = DooHTML.DAO
+	static get version() {return 'v0.90.2b'}
 
 	static define(klass, alias=null) {
 		let name = alias || klass.name.toLowerCase()
@@ -82,13 +82,13 @@ export class DooHTML extends HTMLElement {
 		//TODO do we need length???
 		if (newVal.length > 0 && oldVal !== newVal) {
 			if (name === 'doo-refresh' && this.dataset.store) {
-				await this.render(DooHTML.DooX.getData(this.getAttribute('bind')))
+				await this.render(Doo.X.getData(this.getAttribute('bind')))
 			} else if (name === 'data-use-state') {
 				//doo noting yet
 			// } else if (name ==="doo-dispatch") {
 			// 	console.log('coolio',(this.getAttribute('bind')))
 
-			// 	await this.render(DooHTML.DooX.getData(this.dataset.src))
+			// 	await this.render(Doo.X.getData(this.dataset.src))
 			} else if (name === 'data-store') {
 				// let dao = window[this.dataset.store]
 				// console.log(dao)
@@ -400,6 +400,27 @@ export class DooHTML extends HTMLElement {
 		}
 		this.showComponentContainer()
 	}	
+	removeChild(dataSetName, node) {
+		alert(node)
+		let tr = walkUpToRenderedChild(node)
+alert(tr)
+	}
+	walkUpToRenderedChild(node) {
+		do  {
+			node = node.parentNode
+		} while (node.parentNode !== this.place[0])
+		console.log(node.getAttribute('key'))
+		return node		
+	}
+
+	getIndex(row) {
+		let idx =  this.data.rows.findIndex((item, i) => {
+			if (item.id === row.key) {
+				return i
+			}
+		}) 
+		return idx
+	}
 
 	render(dataSetName=null, page=0, replaceOrAppendRow=null)  {
 		if (!this.template) {
@@ -461,12 +482,11 @@ export class DooHTML extends HTMLElement {
 		this.templateElem = this.templateNode.content
 		this.initReactiveDataNodes(this.templateNode)
 		this.setContext()
-		
-		if (typeof this.dooAfterRender === 'function') {
-			await this.dooAfterRender()
+		if (window['dooAfterRender'] && typeof window['dooAfterRender'] === 'function') {
+			window['dooAfterRender']()
 		}
 		// TODO make sure that this is safe
-		this.renderTable([],this.place[0])
+		this.render([],this.place[0])
 		//this.setAttribute('doo-refresh', new Date().getTime())
 		// if (typeof this.dooAfterRender === 'function') {
 		// 	this.setAttribute('doo-after-render', 'dooAfterRender')
@@ -534,13 +554,13 @@ export class DooHTML extends HTMLElement {
 
 }	
 if (!window.DooHTML) {
-	DooHTML.DooX = DooX
-	DooHTML.Config = Config
+	DooHTML.X = X
+	//Doo.Config = Config
 	window.Doo = DooHTML
 	window.DooHTML = DooHTML
 }	
 		
 DooHTML.define(DooHTML,'html')
 
-export default DooHTML 
+export default DooHTML
 

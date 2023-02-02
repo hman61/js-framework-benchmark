@@ -1,11 +1,7 @@
-//import { memo, useReducer,useEffect} from 'react';
-import { memo, useReducer } from 'react';
+import { memo, useReducer,useEffect} from 'react';
+//import { memo, useReducer } from 'react';
 import { render } from 'react-dom';
-
 import DooHTML from './Doo-HTML'
-
-//alert(Doo.version)
-
 
 const random = (max) => Math.round(Math.random() * 1000) % max;
 
@@ -87,13 +83,6 @@ const listReducer = (state, action) => {
 // ), (prevProps, nextProps) => prevProps.selected === nextProps.selected && prevProps.item === nextProps.item)
 
 const Button = ({ id, cb, title }) => {
-  // useEffect(() => {
-  //   if (dooData) {
-  //       DooHTML.DooX.setData(dooData)
-  //       DooHTML.DooX.dispatch('data')
-  //       console.log(DooHTML.DooX.getData('data')[0])
-  //   }  
-  // }, [listReducer(data,selected)])
   return (
   <div className="col-sm-6 smallpad">
     <button type="button" className="btn btn-primary btn-block" id={id} onClick={cb}>{title}</button>
@@ -105,6 +94,7 @@ const Jumbotron = memo(({ dispatch }) => (
       <div className="row">
         <div className="col-md-6">
           <h1>React Hooks keyed</h1>
+          <div>{DooHTML.version}</div>
         </div>
         <div className="col-md-6">
           <div className="row">
@@ -119,13 +109,30 @@ const Jumbotron = memo(({ dispatch }) => (
       </div>
     </div>
 ), () => true);
-let ii=0
-//console.log(dooData)
+
 const Main = () => {
   const [{ data, selected }, dispatch] = useReducer(listReducer, initialState);
-  let newData = listReducer(data,selected) || []
-  DooHTML.DooX.setData('data', newData)
+  useEffect(async () => {
+    let clickTarget = await document.querySelector('doo-html').shadowRoot.querySelector('.table') 
+    if (clickTarget) {
 
+      clickTarget.addEventListener('click', e => {
+        e.preventDefault()
+        
+        if (e.target.parentElement.matches('.remove')) {
+          Doo.X.deleteNode('data',e.target.parentElement)
+        } else if (e.target.tagName === 'A') {
+          this.select(e.target)
+        }
+      })
+     
+    }  
+  },[])  
+
+
+  useEffect(() => {
+    Doo.X.setData('data', listReducer(data,selected))
+  },[listReducer(data,selected)])  
 return (<div className="container">
     <Jumbotron dispatch={dispatch} />
     <doo-html
@@ -133,8 +140,10 @@ return (<div className="container">
             data-src="data"
             data-key="data"
             bind="data"
+            data-bind="data"
             template="#table"
-            data-store="DooHTML.DooX"
+            data-store="Doo.X"
+            
     ></doo-html>
     {/* <table className="table table-hover table-striped test-data">
       <tbody>

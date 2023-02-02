@@ -14,9 +14,6 @@ export const DooX = {
     },		
     'getDataSetName':
     function(name)  {
-        if (name && typeof name === 'object') {
-            name = Doo.getDataBind(name)
-        }
         if (!name) {
             console.log('No dataSet name specified.')
             return null
@@ -57,11 +54,28 @@ export const DooX = {
         Doo.DAO.getData(name).splice(idx,1,obj)
         this.refresh(name)
     },
+
+	'deleteNode': (dataSetName, elem) => {
+		do  {
+			elem = elem.parentElement
+		} while (elem.dataset.bind !== dataSetName)
+        // TODO don't try runing while previousSibling instead
+		let idx =  DooX.getData(dataSetName).findIndex((item, i) => {
+            if (item.id == elem.id) return i  // important do not use ===
+        })
+        if (idx > -1) {
+            DooX.remove(dataSetName, idx, false)
+            elem.parentElement.removeChild(elem)
+        }    
+	},
+
     'remove': 
-    function(name, idx) {
+    function(name, idx, re_render=true) {
         name = this.getDataSetName(name)	
-        Doo.DAO.getData(name).splice(idx,1)
-        this.refresh(name)
+        this.getData(name).splice(idx,1)
+        if (re_render === true) {
+            this.dispatch(name)
+        }
     },
     'dispatch':
     async function(name, doc = document) {

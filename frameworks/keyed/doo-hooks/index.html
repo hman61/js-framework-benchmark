@@ -4,132 +4,16 @@
   <meta charset="utf-8" />
   <title>React Hooks</title>
   <link href="/css/currentStyle.css" rel="stylesheet"/>
-  <link href="snipped.css"rel="stylesheet" /> 
 
   <!-- <link href="./js/doo.html.min.js" rel="preload" as="script"/> -->
   <!-- <script src="./js/doo.html.min.js"></script> -->
   <!-- <script type="module" src="./js/Main.class.js" defer ></script> -->
   <template id="table">
-  <section>
-    <link href="./snipped.css"rel="stylesheet" /> 
-    
-    <div class="header">
-
-      <div class="logout-pop-up pop-up hide flex-container">
-        <div class="pup-up-content border-radius-6">
-          <a href="#" class="close-btn"><i class="fal fa-times"></i></a>
-          <i class="fal fa-info-circle"></i>
-          <h2>Logging Out?</h2>
-          <p>You are attempting log out of Vatom Market. Do you really want to log out?</p>
-          <div class="logout-buttons flex-container justify-content-space-around">
-            <a href="#" class="cta-button cancel white-grey" title="Cancel"><span>Cancel</span></a>	
-            <a href="https://market.vatom.com/wp-login.php?action=logout&amp;redirect_to=https%3A%2F%2Fmarket.vatom.com&amp;_wpnonce=c6aa643676" title="Logout" class="cta-button"><span>Log me out</span></a>
-          </div>
-        </div><!--END POP-UP-CONTENT-->  
-        <div class="pop-up-background"></div><!--END POP-UP-BACKGROUND-->  
-      </div><!--END LOGOUT-POP-UP-->  
-  
-      <div class="header-inside">
-        <div class="w-100 h-100 flex-container align-items-center XXsnipcss_extracted_selector_selectionXX snipcss0-0-0-1 tether-target-attached-top tether-element-attached-top tether-element-attached-center tether-target-attached-center">
-          <section class="snipcss0-1-1-2">
-            <div class="logo snipcss0-2-2-3">
-              <a href="https://market.vatom.com/" title="Vatom Market - Vatom Market" class="snipcss0-3-3-4">
-                <img data-src="https://market.vatom.com/wp-content/themes/market/images/vatom-icon.svg" class="lazyloaded snipcss0-4-4-5" src="https://market.vatom.com/wp-content/themes/market/images/vatom-icon.svg"><noscript class="snipcss0-4-4-6"><img src="https://market.vatom.com/wp-content/themes/market/images/vatom-icon.svg"></noscript>
-                <span class="snipcss0-4-4-7">Market</span>
-              </a>
-            </div>
-            <span class="bento-menu-button circle-button hover snipcss0-2-2-8">
-              <img data-src="https://market.vatom.com/wp-content/themes/market/images/bento-menu/bento-menu-icon.svg" class="lazyloaded snipcss0-3-8-9" src="https://market.vatom.com/wp-content/themes/market/images/bento-menu/bento-menu-icon.svg"><noscript class="snipcss0-3-8-10"><img src="https://market.vatom.com/wp-content/themes/market/images/bento-menu/bento-menu-icon.svg"></noscript>
-            </span>
-            <div class="app-menu bento-menu snipcss0-2-2-11">
-              <ul class="drop-down snipcss0-3-11-12">
-                
-    <li class="snipcss0-4-12-13">
-      <a href="https://market.vatom.com/" class="active snipcss0-5-13-14" title="Market">
-        <span class="svg-holder snipcss0-6-14-15"><img data-src="https://market.vatom.com/wp-content/themes/market/images/bento-menu/market-icon.svg" class="lazyloaded snipcss0-7-15-16" src="https://market.vatom.com/wp-content/themes/market/images/bento-menu/market-icon.svg"><noscript class="snipcss0-7-15-17"><img src="https://market.vatom.com/wp-content/themes/market/images/bento-menu/market-icon.svg"></noscript></span>
-        <span class="snipcss0-6-14-18">Market</span>
-      </a>
-    </li>
-    <li class="snipcss0-4-12-19">
-      <a href="https://spaces.vatom.com" target="_blank" title="Spaces" class="snipcss0-5-19-20">
-        <span class="svg-holder snipcss0-6-20-21"><img data-src="https://market.vatom.com/wp-content/themes/market/images/bento-menu/spaces-icon.svg" class="lazyloaded snipcss0-7-21-22" src="https://market.vatom.com/wp-content/themes/market/images/bento-menu/spaces-icon.svg"><noscript class="snipcss0-7-21-23"><img src="https://market.vatom.com/wp-content/themes/market/images/bento-menu/spaces-icon.svg"></noscript></span>
-        <span class="snipcss0-6-20-24">Spaces</span>
-      </a>
-    </li>
-    <li class="snipcss0-4-12-25">
-      <a href="https://studio.vatominc.com/" target="_blank" title="Studio" class="snipcss0-5-25-26">
-        <span class="svg-holder snipcss0-6-26-27"><img data-src="https://market.vatom.com/wp-content/themes/market/images/bento-menu/studio-icon.svg" class="lazyloaded snipcss0-7-27-28" src="https://market.vatom.com/wp-content/themes/market/images/bento-menu/studio-icon.svg"><noscript class="snipcss0-7-27-29"><img src="https://market.vatom.com/wp-content/themes/market/images/bento-menu/studio-icon.svg"></noscript></span>
-        <span class="snipcss0-6-26-30">Studio</span>
-      </a>
-    </li>
-    <li class="snipcss0-4-12-31">
-      <a href="https://wallet.vatom.com/" target="_blank" title="Wallet" class="snipcss0-5-31-32">
-        <span class="svg-holder snipcss0-6-32-33"><img data-src="https://market.vatom.com/wp-content/themes/market/images/bento-menu/wallet-icon.svg" class="lazyloaded snipcss0-7-33-34" src="https://market.vatom.com/wp-content/themes/market/images/bento-menu/wallet-icon.svg"><noscript class="snipcss0-7-33-35"><img src="https://market.vatom.com/wp-content/themes/market/images/bento-menu/wallet-icon.svg"></noscript></span>
-        <span class="snipcss0-6-32-36">Wallet</span>
-      </a>
-    </li>						</ul>
-            </div>
-          </section>
-          <section class="menu-section snipcss0-1-1-37">
-            <ul class="menu snipcss0-2-37-38">
-              <div class="nav-menu snipcss0-3-38-39">
-              <li id="menu-item-341" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-341 snipcss0-4-39-40"><a title="Explore" href="https://market.vatom.com/explore/" class="snipcss0-5-40-41">Explore</a></li>
-  <li id="menu-item-11156" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11156 snipcss0-4-39-42"><a href="https://market.vatom.com/plugins/" class="snipcss0-5-42-43">Plugins</a></li>
-                <li class="snipcss0-4-39-44"><a href="https://www.vatom.com/platform/nft/" class="menu-item menu-item-type-post_type menu-item-object-page snipcss0-5-44-45" title="Create" target="_blank"><span class="snipcss0-6-45-46">Create</span></a></li>
-                <li class="snipcss0-4-39-47"><a href="https://support.vatom.com/" class="menu-item menu-item-type-post_type menu-item-object-page snipcss0-5-47-48" title="Help Center" target="_blank"><span class="snipcss0-6-48-49">Help Center</span></a></li>
-              </div>
-            </ul>	
-            <div class="under-menu flex-container align-items-center snipcss0-2-37-50">
-                      
-              <a href="#" class="cta-button log-in sign-in snipcss0-3-50-51" title="Log In"><i class="fal fa-sign-in snipcss0-4-51-52"></i><span class="snipcss0-4-51-53">Log In</span></a>
-                      </div>				
-          </section>
-          <span class="search-button snipcss0-1-1-54"><i class="fal fa-search snipcss0-2-54-55"></i></span>
-          <div class="main-search snipcss0-1-1-56">
-            <form method="get" action="https://market.vatom.com/" data-hs-cf-bound="true" class="snipcss0-2-56-57">
-              <div class="search-input search-input-main snipcss0-3-57-58">
-                <span class="search-back snipcss0-4-58-59" title="Back"><i class="far fa-angle-left snipcss0-5-59-60"></i></span>
-                <input type="text" name="s" autocomplete="off" placeholder="Search" value="" class="snipcss0-4-58-61">
-              </div>
-              <span class="search-submit align-items-center snipcss0-3-57-62" type="submit" title="Search"><i class="fal fa-search snipcss0-4-62-63"></i></span>
-              <a href="#" class="search-clear flex-container align-items-center hide snipcss0-3-57-64">
-                <span class="svg-holder snipcss0-4-64-65"><img data-src="https://market.vatom.com/wp-content/themes/market/images/search-form/clear.svg" class="lazyload snipcss0-5-65-66" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="><noscript class="snipcss0-5-65-67"><img src="https://market.vatom.com/wp-content/themes/market/images/search-form/clear.svg"></noscript></span>
-              </a>
-            </form>
-            <div class="initial-search-results search-container hide snipcss0-2-56-68">
-              <ul class="border-radius-6 snipcss0-3-68-69">
-                <li class="nfts results-header hide snipcss0-4-69-70">NFTs</li>
-                <li class="creators results-header hide snipcss0-4-69-71">Accounts</li>
-                <li class="plugins results-header hide snipcss0-4-69-72">Plugins</li>
-                <li class="no-results results-header hide snipcss0-4-69-73">No results found</li>
-                <li class="results-header press-enter snipcss0-4-69-74">Press Enter to search all items <span class="snipcss0-5-74-75">
-                  <span class="svg-holder snipcss0-6-75-76"><img data-src="https://market.vatom.com/wp-content/themes/market/images/search-form/enter.svg" class="lazyload snipcss0-7-76-77" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="><noscript class="snipcss0-7-76-78"><img src="https://market.vatom.com/wp-content/themes/market/images/search-form/enter.svg"></noscript></span>
-                </span></li>
-              </ul>
-            </div>
-            <div class="search-history search-container hide snipcss0-2-56-79">
-              <ul class="border-radius-6 snipcss0-3-79-80">
-                <li class="results-header history snipcss0-4-80-81">No Search History</li>
-              </ul>
-            </div>
-          </div>
-          <button class="hamburger snipcss0-1-1-82" type="button">
-            <span class="snipcss0-2-82-83"></span>
-            <span class="snipcss0-2-82-84"></span>
-            <span class="snipcss0-2-82-85"></span>
-          </button>
-        </div>			
-      </div>
-    </div>
     <table class="table table-hover table-striped test-data">
-      <tbody id="tbody"><tr data-key="data"  bind="data" data-src="data"><td class="col-md-1">{{id}}</td><td class="col-md-4"><a>{{label}}</a></td><td class="col-md-1"><a class="remove"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td class="col-md-6"></td></tr></tbody>
+      <tbody id="tbody"><tr data-key="data" data-bind="data"  bind="data" data-src="data"  id="{{id}}"><td class="col-md-1">{{id}}</td><td class="col-md-4"><a>{{label}}</a></td><td class="col-md-1"><a class="remove"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td class="col-md-6"></td></tr></tbody>
     </table>
     <link href="/css/currentStyle.css" rel="stylesheet">
-    <link href="./snipped.css" rel="stylesheet">
-  </section>  
-
   </template>
-
 </head>
 <body>
   <div id="main"></div>
