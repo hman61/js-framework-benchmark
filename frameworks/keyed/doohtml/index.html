@@ -5,9 +5,9 @@
   <title>DooHTML</title>
   <link href="/css/currentStyle.css" rel="preload" as="style"/>
   <link href="/css/currentStyle.css" rel="stylesheet"/>
-  <script type="module" src="./js/doo.html.min.js"></script>
-  <script type="module" src="./js/Main.class.js" defer ></script>
-  <template id="table1">
+  <!--<script type="module" src="./js/doo.html.min.js"></script> -->
+  <script type="module" src="./dist/main.js" defer ></script>
+  <template id="table">
 	<table class="table table-hover table-striped test-data">
 		<tbody id="tbody"><tr bind="rows" data-use-state="rows"><td class="col-md-1">{{id}}</td><td class="col-md-4"><a>{{label}}</a></td><td class="col-md-1"><a class="remove"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td class="col-md-6"></td></tr></tbody>
 	</table>
@@ -47,16 +47,17 @@
               </div>
           </div>
       </div>
-        <doo-main
-            context="shadow"
-            xlink="/css/currentStyle.css"
-            bind="rows"
-            template="#table1"
-            data-use-state="rows"
-            data-store="dao"
-            data-name="xxx"
-        ></doo-main>
-    </div>  
+      <doo-main
+        context="shadow"
+        data-src="data"
+        data-key="data"
+        bind="data"
+        data-bind="data"
+        template="#table"
+        data-store="Doo.X"
+      
+    ></doo-main>
+</div>  
     <span class="preloadicon glyphicon glyphicon-remove" aria-hidden="true"></span>
   </div>
 </body>

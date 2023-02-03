@@ -11,7 +11,7 @@ const lenA = adjectives.length, lenB = colours.length, lenC = nouns.length
 import Timer from './doo.timer.js'
 
 Doo.define(
-  	class Main extends Doo {
+  	class Main extends DooHTML {
 		constructor() {
 			super(100)
 			this.scrollTarget = '.table'
