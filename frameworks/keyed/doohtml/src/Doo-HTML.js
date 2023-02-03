@@ -358,7 +358,7 @@ export class DooHTML extends HTMLElement {
 		,j=0
 		const node1 = document.createElement('tbody')
 		if (clear) {
-			this.place[0].textContent = ''
+			place.textContent = ''
 		}
 		if (stop > dataLen) { stop = dataLen }
 		for (let i = start; i<stop; i++) {
@@ -371,7 +371,7 @@ export class DooHTML extends HTMLElement {
 			node1.innerHTML = html.join('')
 
 			html = []
-			this.place[0].appendChild(node1.firstElementChild).key = i
+			place.appendChild(node1.firstElementChild).key = i
 
 		}
 	}
