@@ -357,7 +357,7 @@ export class DooHTML extends HTMLElement {
 		,placeLen = place.templateArray.length
 		,j=0
 		const node1 = document.createElement('tbody')
-		this.place[0].textContent = ''
+		this.place[0].textContent = null
 		if (stop > dataLen) { stop = dataLen }
 		for (let i = start; i<stop; i++) {
 			for (j=0; j<placeLen; j=j+2) {
@@ -392,7 +392,7 @@ export class DooHTML extends HTMLElement {
 	renderTable(dataSet=this.data[this.defaultDataSet],target=this.place[0], start=0) {
 		let elem = document.createElement('template'),len = dataSet.length, i = len - 1
 		if (len === 0) {
-			target.textContent = ''
+			target.textContent = null
 			this.showComponentContainer()
 			return
 		}
@@ -427,7 +427,7 @@ export class DooHTML extends HTMLElement {
 		return idx
 	}
 
-	render(dataSetName=null, page=0, replaceOrAppendRow=null)  {
+	render(dataSetName=null, page=0, updateNode=null)  {
 		if (!this.template) {
 			console.error(this.name + ' has no template defined')
 			console.log('You need to set a data-template attribute on the <doo-html /> component')
@@ -443,7 +443,7 @@ export class DooHTML extends HTMLElement {
 		}
 		for (let i=0, len=this.place.length;i<len;i++) {
 			if (this.place[i].tagName === 'TR' || this.place[i].tagName === 'TBODY' || this.place[i].tagName === 'TABLE') {
-				this.renderTable(dataSetName, this.place[i], page )
+			//	this.renderTable(dataSetName, this.place[i], page )
 			}  
 			if (dataSetName && dataSetName !== this.place[i].dataKey) {
 				continue   // TODO other for-eachs that are children of the specified data set proably needs to be re-rendered (needs test scenarios)
@@ -455,14 +455,17 @@ export class DooHTML extends HTMLElement {
 			let dataKey = this.place[i].dataKey
 			//this.getFilteredData(this.place[i].dataKey) ? this.getFilteredData(this.place[i].dataKey) : this.data[this.place[i].dataKey]
 			let pageSize = this.place[i].noRepeat ? 1 : this.PAGE_SIZE
-			if (replaceOrAppendRow === null) {
+			if (updateNode) {
+				this.renderNode(this.place[i], dataKey,  replaceOrAppendRow, 1)
+			} else {
 				// if (this.place[i].useParent) {
 				// 	this.place[i].innerHTML =  this.renderNode(this.place[i], dataKey, parseInt(this.getAttribute('key')) , 1)
 				// } else {	
-					this.place[i].innerHTML =  this.renderNode(this.place[i], dataKey,  page * this.PAGE_SIZE, pageSize)
+					this.renderNode(this.place[i], dataSet, page * this.PAGE_SIZE, pageSize)
+
+					//this.place[i].innerHTML =  this.renderNode(this.place[i], dataKey,  page * this.PAGE_SIZE, pageSize)
 				// }	
-			} else {
-				this.place[i].append(this.renderNode(this.place[i], dataKey,  replaceOrAppendRow, 1))
+
 			}
 		}		
 		this.showComponentContainer()

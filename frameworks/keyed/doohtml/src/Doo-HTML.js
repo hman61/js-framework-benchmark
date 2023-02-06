@@ -4,6 +4,7 @@ import X from './Doo-X'
 //import Timer from './doo.timer'
 //import {  createDooTemplate } from './Doo-Template'
 
+/*
 class FieldType {
 	constructor(fld, type) {
 		this._fld = fld
@@ -53,12 +54,12 @@ class FieldType {
 		}
 	} 
 }
-
+*/
 
 
 export class DooHTML extends HTMLElement {
 //	static DAO = DooHTML.DAO
-	static get version() {return 'v0.90.2b'}
+	static get version() {return 'v0.90.4-beta'}
 
 	static define(klass, alias=null) {
 		let name = alias || klass.name.toLowerCase()
@@ -71,6 +72,7 @@ export class DooHTML extends HTMLElement {
 		this.place = []
 		this.template = undefined	
 		this.visibleColumns = []
+		this.hasHtml = false
 	}
 	//set PAGE_SIZE(pageSize) {this.PAGE_SIZE = pageSize }  // remove handled by props
 
@@ -104,9 +106,10 @@ export class DooHTML extends HTMLElement {
 			}	
 		}	
 	}
-	dooParse(argDataNode, component)  {
-
-		const _getPropertyType = (fld, component) => {
+	//TODO change component to "this"
+	dooParse(argDataNode)  {
+/*
+		const _getPropertyType = (fld) => {
 			if (!fld) {
 				return new FieldType('', undefined)
 			}	
@@ -131,7 +134,7 @@ export class DooHTML extends HTMLElement {
 			
 			return fieldType
 		}
-		
+*/		
 		const  _xAttr =  ['src', 'selected', 'checked',  'disabled', 'readonly']  
 
 	
@@ -171,13 +174,61 @@ export class DooHTML extends HTMLElement {
 		for (let i=0; i<len; i++) {
 			if (Config.DELIMITER.BEG.includes(Config.DELIMITER.BEG)) {
 				aStr =  aHTML[i].split(Config.DELIMITER.BEG)
-				templateArray.push(aStr[0])	
-				if (aStr[1]) {
-					templateArray.push(_getPropertyType(aStr[1],component))		
-				}	
+				let htmlEnd = aStr[0].lastIndexOf('>')
+				if (i<len-1) {
+					if (htmlEnd === aStr[0].length-1) {
+						aStr[0] = aStr[0].substring(0,htmlEnd)>
+						templateArray.push(aStr[0])	
+						templateArray.push(`<slot name="${aStr[1]}"></slot>`)		
+					} else {
+						templateArray.push(aStr[0])	
+
+					} 
+					// else {
+					// 	aStr[0] = aStr[0] +'"' + ` data-attr="${aStr[1]}"`
+					// }
+				} else {		
+					templateArray.push(aHTML[i])
+				}		
+				// if (aStr[1]) {
+				// 	if (i<len-1) {
+				// 		if (htmlEnd === aStr[0].length-1) {
+				// 			templateArray.push(`<slot name="${aStr[1]}"></slot>`)		
+				// // 		// } else  {
+				// // 		// 	templateArray.push(aStr.join('') +  `<slot name="${aStr[0]}" data-attr="${aStr[1]}"></slot>`)		
+				//  		 }
+
+				// 	}		
+				// }	
+
 			}	
 		} 
-		return {templateArray,xHtml}
+		let elem = document.createElement('template')
+		elem.innerHTML = templateArray.join('')
+
+
+//TODO move to test.assert
+// console.log('coolio', elem.content.firstElementChild)
+// console.log('foolio', elem.content.firstElementChild.outerHTML)
+// let xxx = elem.content.firstElementChild
+// let data = [{id:1,label:'coolio'}]
+// let xx = xxx.querySelectorAll('slot')
+// xx.forEach(i => i.parentElement.textContent = (data[0][i.name]))
+// console.log('slot', xxx.outerHTML)
+
+
+//let x = elem.content.firstElementChild.querySelectorAll('template')
+// let pointerMap = new Map()
+// for (const item of [...x]) { 
+// 	while (item.parentElement)
+// 		let s = 0
+// 		while (item.previousSibling) {
+// 			s++
+// 		}
+
+	
+// }
+		return {templateArray, processNode:elem.content.firstElementChild, xHtml}
 	}
 	
 	initReactiveDataNodes(tplNode) {
@@ -289,7 +340,8 @@ export class DooHTML extends HTMLElement {
 			}
 			dataElem.dataKey = reactiveElem[i].getAttribute(Config.DATA_BIND)
 			let parsedNode = this.dooParse(reactiveElem[i], this,  this.dataMap)
-			dataElem.templateArray = parsedNode.templateArray 	
+			dataElem.templateArray = parsedNode.templateArray
+			dataElem.processNode = parsedNode.processNode
 			dataElem.xHtml = parsedNode.xHtml 	
 			dataElem.name = i
 			dataElem.level = _getNodeLevel(reactiveElem[i])
@@ -337,45 +389,235 @@ export class DooHTML extends HTMLElement {
 		}	
 		this.initialHeight = this.shadow.firstElementChild.offsetHeight
 	}
+	
 
 	renderNode(place, data, start = 0, pgSize = Config.PAGE_SIZE,clear=true) {
-		const _getItemValue = (item, prop) => {
-			if (typeof prop === 'function') {
-				return this[prop](item)
-			}
-			let curValue = item
-			try { 
-				prop.split('.').forEach(key => curValue = curValue[key])
-			} catch(e) {
-				console.log('Property not found', prop, JSON.stringify(curValue))
-			}
-			return curValue
-		}
+		// const _getItemValue = (item, prop) => {
+		// 	if (typeof prop === 'function') {
+		// 		return this[prop](item)
+		// 	}
+		// 	let curValue = item
+		// 	try { 
+		// 		prop.split('.').forEach(key => curValue = curValue[key])
+		// 	} catch(e) {
+		// 		console.log('Property not found', prop, JSON.stringify(curValue))
+		// 	}
+		// 	return curValue
+		// }
 		let dataLen = data.length
 		,stop = start + pgSize
 		,html = []
 		,placeLen = place.templateArray.length
-		,j=0
-		const node1 = document.createElement('tbody')
+		//,j=0
+
+		//const node1 = document.createElement('tbody')
 		if (clear) {
 			place.textContent = ''
 		}
-		if (stop > dataLen) { stop = dataLen }
-		for (let i = start; i<stop; i++) {
-			for (j=0; j<placeLen; j=j+2) {
-				html.push(place.templateArray[j])
-				if (typeof place.templateArray[j+1] === 'object') {
-					html.push(_getItemValue(data[i],place.templateArray[j+1].fld))
+
+
+		let elem = document.createElement('tbody')
+// 		//let i = data.length - 1
+// 		let p = []
+// 		let cacheNode = place.processNode.cloneNode(true) 
+// 		let slots = cacheNode.querySelectorAll('slot')
+// 		slots.forEach(i => i.parentElement.textContent = (data[i][i.name]))
+// // console.log('slot', xxx.outerHTML)
+
+// 		p[0] = cacheNode['firstElementChild'] //.innerText  //= data[i].id 
+// 		p[1] = p[0]['nextSibling']['firstChild'] //.innerText = data[i].label
+
+		for (let i = stop-1; i>=0; i--) {
+			let cacheNode = place.processNode.cloneNode(true) 
+			let slots = cacheNode.querySelectorAll('slot')
+			slots.forEach(item => item.parentElement.textContent = data[i][item.name])
+			//place.insertBefore(elem.removeChild(elem.lastElementChild), place.firstElementChild)
+			place.insertBefore(cacheNode, place.firstElementChild)
+
+		}	
+		//place.innerHTML = elem.outerHTML
+		// do {
+		// 	target.insertBefore(elem.content.removeChild(elem.content.lastElementChild), target.firstElementChild).key = dataSet[i].id
+		// } while ( --i >=0)
+		// do {
+		// 	place.insertBefore(elem.removeChild(elem.lastElementChild), place.firstElementChild)
+		// } while ( --i >=0)
+return
+
+
+		const targetNode = place;
+		let kk = 0
+
+		// Options for the observer (which mutations to observe)
+		const config = { attributes: true,  subtree: true };
+//		const config = { attributes: true, childList: true, subtree: true };
+//		const config = { childList: true, subtree: true };
+
+		//const config = { attributes: true, subtree: true };
+		
+		// Callback function to execute when mutations are observed
+		const callback = (mutationList, observer) => {
+		  for (const mutation of mutationList) {
+	//		console.log('coolio',mutation.addedNodes.length)
+//			if (mutation.type === 'childList' &&  kk<dataLen) {
+		//		console.log('coolio', mutation)
+	//
+//				console.log('coolio', mutation.addedNodes[0].querySelectorAll('slot'))
+		// try {			
+		// 	let x =  mutation.addedNodes[0].querySelectorAll('slot')
+		// 	for (let j=0,len = x.length;j<len;j++) {
+		// 		x[j].parentElement.textContent = data[kk][x[j].name]
+		// 	}	
+		// 	kk++
+		// } catch (e) { 
+		// 	console.log(e)
+		// }
+
+			// 			console.log(x[0].parentNode.outerHTML)
+// 			for (const item of [...x]) {
+// 				item.parentNode.textContent = data[0][item.dataset.elem]
+// //				delete item.dataset.elem 
+// 			}
+
+	//		console.log('A child node has been added or removed.');
+
+	if (mutation.type === 'attributes') {
+				//console.log(`The ${mutation.attributeName} attribute was modified.`);
+				console.log('coolio', mutation)
+	
+//				console.log('coolio', mutation.addedNodes[0].querySelectorAll('slot'))
+				let x =  mutation.target.childNodes[0].querySelectorAll('slot')
+
+
+
+				for (let j=0,len = x.length;j<len;j++) {
+					x[j].parentElement.textContent = data[kk++][x[j].name]
 				}	
+
+
+
+
 			}
-			node1.innerHTML = html.join('')
+		  }
+		};
+		
+		// Create an observer instance linked to the callback function
+		const observer = new MutationObserver(callback);
+		
+		// Start observing the target node for configured mutations
+		//observer.observe(targetNode, config);
+		
+		// Later, you can stop observing
+//		observer.disconnect();
 
-			html = []
-			place.appendChild(node1.firstElementChild).key = i
+		if (stop > dataLen) { stop = dataLen }
+//		for (let i = stop-1; i>=0; i--) {
 
-		}
+			// for (j=0; j<placeLen; j=j+2) {
+			// 	html.push(place.templateArray[j])
+			// 	// if (typeof place.templateArray[j+1] === 'object') {
+			// 	// 	html.push(_getItemValue(data[stop-1],place.templateArray[j+1].fld))
+			// 	// }	
+			// }	
+			// node1.innerHTML = html.join('')
+			//TODO use data-key from dataset on doo-html element
+//			let newNode = place.insertBefore(place.processNode, place.firstElementChild).key = data[stop-1].id
+		// let cloneNode = place.processNode.cloneNode(true)
+
+		// 	let newNode = place.appendChild(cloneNode) 
+		// 	newNode.key = data[stop-1].id
+		// 	let x = newNode.querySelectorAll("[data-elem]")
+		// 	for (const item of [...x]) {
+		// 		item.textContent = data[stop-1][item.dataset.elem]
+		// 		delete item.dataset.elem 
+		// 	}
+			
+		// 	let y = newNode.querySelectorAll('[data-attr]')
+		// 	if (y.length) {
+		// 		for (const item of [...y]) {
+		// 			item.setAttribute(item.dataset.attr,data[i][item.dataset.attr])
+		// 			delete item.dataset.attr 
+		// 		}
+		// 	}
+		// 	debugger
+		for (let i = 0; i<stop; i++) {
+				// cacheNode = place.firstElementChild.cloneNode(true) 
+			// cacheNode['firstElementChild'].innerText = data[i].id 
+			// cacheNode['firstElementChild']['nextSibling']['firstChild'].innerText = data[i].label
+
+			let cacheNode = place.processNode.cloneNode(true)
+			// cacheNode['firstElementChild'].textContent = data[i].id 
+			// cacheNode['firstElementChild']['nextSibling']['firstChild'].textContent = data[i].label
+			cacheNode.key = data[i].id
+			place.appendChild(cacheNode) 
+		//	place.appendChild(cacheNode) 
+		//	place.setAttribute('data-idx', Number(cacheNode.key) - 1)
+
+		//	let newNode = place.appendChild(cacheNode) 
+
+//			let newNode = place.appendChild(place.processNode.cloneNode(true)) 
+//			let newNode = place.insertBefore(place.processNode, place.firstElementChild)
+
+// newNode.key = data[i].id
+// 			let x = newNode.querySelectorAll("[data-elem]")
+// 			for (const item of [...x]) {
+// 				item.textContent = data[i][item.dataset.elem]
+// 				delete item.dataset.elem 
+// 			}
+			
+// 			let y = newNode.querySelectorAll('[data-attr]')
+// 			if (y.length) {
+// 				for (const item of [...y]) {
+// 					item.setAttribute(item.dataset.attr,data[i][item.dataset.attr])
+// 					delete item.dataset.attr 
+// 				}
+// 			}	
+			// cacheNode = place.firstElementChild.cloneNode(true) 
+			// cacheNode['firstElementChild'].innerText = data[i].id 
+			// cacheNode['firstElementChild']['nextSibling']['firstChild'].innerText = data[i].label
+		// 	 _getItemValue(data[i],place.templateArray[j+1].fld
+		// 		const tr = rowTemplate.cloneNode(true),
+        //     td1 = tr.firstChild,
+        //     a2 = tr.firstChild.nextSibling.firstChild;
+        // tr.data_id = data.id;
+        // td1.textContent = data.id;
+        // a2.textContent = data.label;
+
+		// 		for (j=0; j<placeLen; j=j+2) {
+		// 		html.push(place.templateArray[j])
+		// 		if (typeof place.templateArray[j+1] === 'object') {
+		// 			cacheNode.firstChildElementChild.textContent = _getItemValue(data[i],place.templateArray[j+1].fld 
+		// 			cacheNode.td1.nextSibling.firstChild.textContent = _getItemValue(data[i],place.templateArray[j+1].fld
+			
+		// 			html.push(_getItemValue(data[i],place.templateArray[j+1].fld))
+		// 		}	
+		// 	}
+		// 	node1.innerHTML = html.join('')
+		// 	html = []
+			//place.insertBefore(elem.removeChild(elem.lastElementChild), target.firstElementChild).key = dataSet[i].id
+//			place.insertBefore(node1.firstElementChild, place.firstElementChild).key = data[i].id
+	//		place.insertBefore(cacheNode, place.firstElementChild).key = data[i].id
+
+			// let no = place.appendChild(node1.firstElementChild) //.key = i
+			// tb.append(no)
+	//	let x = Array.from(place.childNodes)
+	//	console.log('coolio', x)
 	}
- 
+	let x = place.querySelectorAll('slot')
+	for (let i = 0; i<stop; i++) {
+		place.setAttribute('data-id',i)
+
+
+	}
+	let k = 0
+	for (let j=0,len = x.length;j<len;j++) {
+		if (data[k]) {
+			x[j].parentElement.textContent = data[k][x[j].name]
+			k++
+		}	
+	}	
+
+
 	// _highlight(val, filterVal)  {
 	// 	let filterKey = filterVal && filterVal.toLowerCase()
 	// 	if (!filterKey || !val) {return val}
@@ -384,7 +626,7 @@ export class DooHTML extends HTMLElement {
 	// 	//TODO make <b> configurable
 	// 	return value.replace(re, txt => `<b class="doo-find">${txt}</b>`)
 	// }
-
+	}
 
 	showComponentContainer(show=true) {
 		if (this.componentContainer) {

@@ -10,8 +10,7 @@ const lenA = adjectives.length, lenB = colours.length, lenC = nouns.length
 
 import Timer from './doo.timer.js'
 import Doo from './Doo-HTML.js'
-Doo.define(  	class Main extends Doo {
-//		class Main  {
+Doo.define(class Main extends Doo {
 			constructor() {
 			super(100)
 			this.scrollTarget = '.table'
@@ -164,7 +163,7 @@ Doo.define(  	class Main extends Doo {
 		}
 
 		clear(e) {
-			this.tbody.textContent = ''
+			this.tbody.textContent = null
 			this.data.rows = []
 	
 		}

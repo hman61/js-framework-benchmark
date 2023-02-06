@@ -211,7 +211,7 @@ class Main {
         this.store.run();
         this.appendRows();
         this.unselect();
-//        e.target.blur()
+        e.target.blur()
         Timer.stop('tot')
     }
     add() {
@@ -289,7 +289,7 @@ class Main {
         this.store.runLots();
         this.appendRows();
         this.unselect();
-//        e.target.blur()
+        e.target.blur()
         Timer.stop('tot')
 
     }
