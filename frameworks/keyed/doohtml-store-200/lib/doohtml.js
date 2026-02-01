@@ -8,8 +8,12 @@ const Config = {
 	KEY:'key'
 }
 
-const {cloneNode} = globalThis.Node.prototype;
+const {cloneNode, appendChild} = globalThis.Node.prototype;
 const cloneDeep = n => cloneNode.call(n, true);
+const appendRow = function(child) {
+	return appendChild.call(this, child);
+};
+
 
 // TODO: test in single benchmark test suite
 // const cloneDeep = (node) => {
@@ -18,7 +22,7 @@ const cloneDeep = n => cloneNode.call(n, true);
 // };
 
 
-const version = 'v0.98.8-200'
+const version = 'v0.98.8-dataProvider'
 
 const getItemValue = (item, prop) => {
     if (!prop.includes('.')) {
@@ -37,9 +41,24 @@ const isTable = (node) => {
 	return ['TABLE','TBODY','THEAD','TFOOT','TR','TH'].includes(node.tagName)
 }
 
+const setNodeValues = (node, dataItem, dataSlots) => {
+	const len = dataSlots.length
+	for (let x = 0; x < len; x++) {
+		const curNode = getNode(node, dataSlots[x][1], 0)
+		if (curNode) {
+			if (dataSlots[x][2] === 'textContent') {
+				curNode.nodeValue = dataItem[dataSlots[x][0]]
+			} else {
+				curNode.setAttribute(dataSlots[x][2], dataItem[dataSlots[x][0]])
+			}
+		} else {
+			globalThis.console.log('Field:' + dataSlots[x][0] + ' does not exist')
+		}
+	}
+}
+
 const render = (target, data, start = 0) => {
-	const len = data.length
-	if (len === 0) {
+	if (data.length === 0) {
 		target.textContent = ''
 		return
 	} 
@@ -51,29 +70,40 @@ const renderHTML = (target, data, start = 0, end=null) => {
 	
 	let	stop = end ? start + dataLen :  dataLen - start
 	if (stop > dataLen) { stop = dataLen }
-
-	const len = target.dataSlots.length
-	const _setNodeValues = (node,i)  => {
-		for (let x=0; x<len;x++) {
-			const curNode = getNode(node,target.dataSlots[x][1],0)
-			if (curNode) {
-				if (target.dataSlots[x][2] === 'textContent') {
-					curNode.nodeValue = data[i][target.dataSlots[x][0]]
-				} else {
-					curNode.setAttribute(target.dataSlots[x][2], data[i][target.dataSlots[x][0]])
-				}	
-			} else {
-				console.info('Field:' + target.dataSlots[x][0] + ' does not exist')
-			}
-		}	
+	const insertRow = appendRow.bind(target)
+	const key = target[Config.KEY]
+	for (let i = start; i<stop; ++i) {
+		setNodeValues(target.processNode, data[i], target.dataSlots)
+		let cloned = cloneDeep(target.processNode)
+		cloned[Config.KEY] = getItemValue(data[i],key)
+		insertRow(cloned)
 	}
+
+}
+
+const renderHTMLWithProvider = (target, dataProvider, start = 0, length = null, rows = []) => {
+	if (length === null || length === 0) {
+		return
+	}
+	
+	const stop = start + length
+	// Get the table parent (assuming target is tbody)
+	// const table = target.parentElement
+	// const wasAttached = table && table.contains(target)
+	
+	// // Detach tbody from DOM if attached (like vanillajs-lite-timer approach)
+	// if (wasAttached) {
+	// 	target.remove()
+	// }
 	const key = target[Config.KEY]
 	let fragment = globalThis.document.createDocumentFragment()
 	const fragmentList = []
 	for (let i = start; i<stop; ++i) {
-		_setNodeValues(target.processNode, i)
+		// Call provider to get single data object for this index
+		const dataItem = dataProvider(i, rows)
+		setNodeValues(target.processNode, dataItem, target.dataSlots)
 		let cloned = cloneDeep(target.processNode)
-		cloned[Config.KEY] = getItemValue(data[i],key)
+		cloned[Config.KEY] = getItemValue(dataItem	,key)
 		fragment.append(cloned)
 		// Append fragment every batchSize nodes or at the end
 		if ((i - start + 1) % 200 === 0 || i === stop - 1) {
@@ -87,11 +117,36 @@ const renderHTML = (target, data, start = 0, end=null) => {
 //	fragmentList.forEach(f => target.append(f))
 
 	target.append(...fragmentList)
+}
 
+const renderWithProvider = (target, dataProvider, start = 0, length = null, rows = []) => {
+	renderHTMLWithProvider(target, dataProvider, start, length, rows)
 }
 
 const append = (target, dataSet, start=0) => {
 	renderHTML(target, dataSet, start , dataSet.length - start)
+}
+
+const appendWithProvider = (target, dataProvider, start = 0, length = null, rows = []) => {
+	if (length === null || length === 0) {
+		return
+	}
+	
+	const stop = start + length
+	const key = target[Config.KEY]
+	const insertRow = appendRow.bind(target)
+	
+	// Simple loop - append to existing content (keep attached)
+	for (let i = start; i < stop; ++i) {
+		// Call provider to get single data object for this index
+		const dataItem = dataProvider(i, rows)
+		
+		// Set values and clone the process node
+		setNodeValues(target.processNode, dataItem, target.dataSlots)
+		let cloned = cloneDeep(target.processNode)
+		cloned[Config.KEY] = getItemValue(dataItem, key)
+		insertRow(cloned)
+	}
 }	
 
 const dooParse = (argDataNode) => { 
@@ -220,13 +275,13 @@ const dooParse = (argDataNode) => {
 
 const fetchTemplate = (url) => {
 	return new Promise((resolve, reject) => {
-	  // eslint-disable-next-line no-undef
-	  const xhr = new XMLHttpRequest()
-	  xhr.open("GET", url)
-	  xhr.addEventListener('load', () => resolve(xhr.responseText))
-	  // eslint-disable-next-line unicorn/prefer-add-event-listener
-	  xhr.onerror = () => reject(xhr.statusText)
-	  xhr.send()
+		// eslint-disable-next-line no-undef
+		const xhr = new XMLHttpRequest()
+		xhr.open("GET", url)
+		xhr.addEventListener('load', () => resolve(xhr.responseText))
+		// eslint-disable-next-line unicorn/prefer-add-event-listener
+		xhr.onerror = () => reject(xhr.statusText)
+		xhr.send()
 	})
 }
 
@@ -255,7 +310,7 @@ const setReactiveDataNodes = (tplNode) => {
 			const dataElem = '|STYLE|LINK|'.includes(`|${elem.tagName}|`)
 				? elem
 				: elem.parentElement &&
-				  '|DL|UL|TBODY|THEAD|TFOOT|TR|SELECT|SECTION|'.includes(`|${elem.parentElement.tagName}|`)
+				'|DL|UL|TBODY|THEAD|TFOOT|TR|SELECT|SECTION|'.includes(`|${elem.parentElement.tagName}|`)
 				? elem.parentElement
 				: elem.parentElement // globalThis.document.createElement('data') TODO: add infinite vertical scroll using a data element wrapper
 
@@ -340,4 +395,4 @@ const createTemplate = async (id, data = [], src = null) => {
 	
     return templateNode["place"][0]
 }
-export  {createTemplate, append, render, Config , version, prefetchTemplate}
+export  {createTemplate, append, appendWithProvider, render, renderWithProvider, Config , version, prefetchTemplate}

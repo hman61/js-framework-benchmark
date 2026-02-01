@@ -249,8 +249,8 @@ async function runTest() {
   } else {
     // Default frameworks to test
     const defaultFrameworks = [
-      "doohtml-prov-tc",
-      "doohtml-prov-tc-bind",
+    //  "doohtml-prov-tc",
+    //  "doohtml-prov-tc-bind",
       "doohtml-prov-nv",
       "doohtml-prov-nv-bind",
     //  "doohtml-prov-nv-bind-200",
