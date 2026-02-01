@@ -1,0 +1,42 @@
+{
+    "name": "js-framework-benchmark-doohtml",
+    "version": "0.98.6",
+    "description": "DooHTML JS-Benchmark",
+    "type": "module",
+    "main": "main.js",
+
+    "js-framework-benchmark": {
+      "frameworkVersion": "",
+      "frameworkHomeURL": "https://doohtml.com",
+      "useShadowRoot": false,
+      "shadowRootName": "",
+      "buttonsInShadowRoot": false,
+      "issues": [772, 1139]
+    },
+    "scripts": {
+      "dev": "exit 0",
+      "build-prod": "rollup -c --environment BUILD:production"
+    },
+    "keywords": [],
+    "author": "Henrik Javen",
+    "license": "Apache-2.0",
+    "eslintConfig": {
+      "env": {
+        "browser": true,
+        "es6": true
+      }
+    },
+    "homepage": "https://doohtml.com",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/hman61/js-framework-benchmark"
+    },
+    "devDependencies": {
+      "@rollup/plugin-node-resolve": "^15.2.3",
+      "@rollup/plugin-terser": "^0.4.4",
+      "eslint": "^9.9.1",
+      "eslint-plugin-unicorn": "^55.0.0",
+      "rollup": "^4.18.0"
+    }
+  }
+  

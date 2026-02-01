@@ -8,8 +8,9 @@ const Config = {
 	KEY:'key'
 }
 
-const {cloneNode} = globalThis.Node.prototype;
+const {cloneNode, appendChild} = globalThis.Node.prototype;
 const cloneDeep = n => cloneNode.call(n, true);
+const appendRow = n => appendChild.call(n, true);
 
 
 // TODO: test in single benchmark test suite
@@ -19,7 +20,8 @@ const cloneDeep = n => cloneNode.call(n, true);
 // };
 
 
-const version = 'v0.98.8-prov-tc'
+const version = 'v0.98.8-prov-nv-bind-200'
+
 
 const getItemValue = (item, prop) => {
     if (!prop.includes('.')) {
@@ -44,7 +46,7 @@ const setNodeValues = (node, dataItem, dataSlots) => {
 		const curNode = getNode(node, dataSlots[x][1], 0)
 		if (curNode) {
 			if (dataSlots[x][2] === 'textContent') {
-				curNode.textContent = dataItem[dataSlots[x][0]]
+				curNode.nodeValue = dataItem[dataSlots[x][0]]
 			} else {
 				curNode.setAttribute(dataSlots[x][2], dataItem[dataSlots[x][0]])
 			}
@@ -67,14 +69,13 @@ const renderHTML = (target, data, start = 0, end=null) => {
 	
 	let	stop = end ? start + dataLen :  dataLen - start
 	if (stop > dataLen) { stop = dataLen }
-
+	const insertRow = appendRow.bind(target)
 	const key = target[Config.KEY]
 	for (let i = start; i<stop; ++i) {
 		setNodeValues(target.processNode, data[i], target.dataSlots)
 		let cloned = cloneDeep(target.processNode)
 		cloned[Config.KEY] = getItemValue(data[i],key)
-		target.append(cloned)
-
+		insertRow(cloned)
 	}
 
 }
@@ -86,17 +87,45 @@ const renderHTMLWithProvider = (target, dataProvider, start = 0, length = null, 
 	
 	const stop = start + length
 	const key = target[Config.KEY]
+	const batchSize = 50  // Match vanillajs-lite-timer batch size
 	
-	// Single loop: call provider for each index and immediately inject
-	for (let i = start; i < stop; ++i) {
-		// Call provider to get single data object for this index (provider will push to rows)
-		const dataItem = dataProvider(i, rows)
+	// Get the table parent (assuming target is tbody)
+	const table = target.parentElement
+	const wasAttached = table && table.contains(target)
+	
+	// Detach tbody from DOM if attached (like vanillajs-lite-timer approach)
+	if (wasAttached) {
+		target.remove()
+	}
+	
+	// Process in batches of 50
+	for (let batchStart = start; batchStart < stop; batchStart += batchSize) {
+		const batchEnd = Math.min(batchStart + batchSize, stop)
 		
-		// Immediately inject into HTML template
-		setNodeValues(target.processNode, dataItem, target.dataSlots)
-		let cloned = cloneDeep(target.processNode)
-		cloned[Config.KEY] = getItemValue(dataItem, key)
-		target.append(cloned)
+		// Create a document fragment for this batch
+		const fragment = globalThis.document.createDocumentFragment()
+		
+		// Build all rows in this batch into the fragment
+		for (let i = batchStart; i < batchEnd; ++i) {
+			// Call provider to get single data object for this index
+			const dataItem = dataProvider(i, rows)
+			
+			// Set values and clone the process node
+			setNodeValues(target.processNode, dataItem, target.dataSlots)
+			let cloned = cloneDeep(target.processNode)
+			cloned[Config.KEY] = getItemValue(dataItem, key)
+			
+			// Append to fragment
+			fragment.appendChild(cloned)
+		}
+		
+		// Use insertBefore with null (appends at end, matches vanillajs pattern)
+		target.insertBefore(fragment, null)
+	}
+	
+	// Re-attach tbody to table if it was attached (single reflow at the end)
+	if (wasAttached && table) {
+		table.appendChild(target)
 	}
 }
 
@@ -115,17 +144,31 @@ const appendWithProvider = (target, dataProvider, start = 0, length = null, rows
 	
 	const stop = start + length
 	const key = target[Config.KEY]
+	const batchSize = 50  // Match vanillajs-lite-timer batch size
 	
-	// Single loop: call provider for each index and immediately inject
-	for (let i = start; i < stop; ++i) {
-		// Call provider to get single data object for this index (provider will push to rows)
-		const dataItem = dataProvider(i, rows)
+	// Process in batches of 50
+	for (let batchStart = start; batchStart < stop; batchStart += batchSize) {
+		const batchEnd = Math.min(batchStart + batchSize, stop)
 		
-		// Immediately inject into HTML template
-		setNodeValues(target.processNode, dataItem, target.dataSlots)
-		let cloned = cloneDeep(target.processNode)
-		cloned[Config.KEY] = getItemValue(dataItem, key)
-		target.append(cloned)
+		// Create a document fragment for this batch
+		const fragment = globalThis.document.createDocumentFragment()
+		
+		// Build all rows in this batch into the fragment
+		for (let i = batchStart; i < batchEnd; ++i) {
+			// Call provider to get single data object for this index
+			const dataItem = dataProvider(i, rows)
+			
+			// Set values and clone the process node
+			setNodeValues(target.processNode, dataItem, target.dataSlots)
+			let cloned = cloneDeep(target.processNode)
+			cloned[Config.KEY] = getItemValue(dataItem, key)
+			
+			// Append to fragment
+			fragment.appendChild(cloned)
+		}
+		
+		// Use insertBefore with null (appends at end, matches vanillajs pattern)
+		target.insertBefore(fragment, null)
 	}
 }	
 

@@ -1,10 +1,13 @@
 'use strict'
 
-import {Timer, adjectives, colours, nouns} from '../../doohtml-timer-and-data/Timer.js'
-import {render, createTemplate, append, appendWithProvider, renderWithProvider, version} from '../lib/doohtml.js'
+import {render, createTemplate, append, version} from '../lib/doohtml.js'
 // TODO: verify this is the fastest way to get random integers in single benchmark test suite
 
 const _random = max => Math.trunc(Math.random() * max)
+
+const adjectives = ["pretty", "large", "big", "small", "tall", "short", "long", "handsome", "plain", "quaint", "clean", "elegant", "easy", "angry", "crazy", "helpful", "mushy", "odd", "unsightly", "adorable", "important", "inexpensive", "cheap", "expensive", "fancy"]
+const colours = ["red", "yellow", "blue", "green", "pink", "brown", "purple", "brown", "white", "black", "orange"]
+const nouns = ["table", "chair", "house", "bbq", "desk", "car", "pony", "cookie", "sandwich", "burger", "pizza", "mouse", "keyboard"]
 
 const lenA = adjectives.length, lenB = colours.length, lenC = nouns.length
 
@@ -12,15 +15,6 @@ const DEFAULT_SIZE = 1000, DEFAULT_SIZE_RUN_LOTS = 10000, SWAP_ROW = 998, BANG =
 
 let rows = [], ID = 1, selectedRow, tbody = null 
 
-
-const buildRow = (index, rows) => {
-	// TODO: test in single benchmark test suite
-	const label = `${adjectives[_random(lenA)]} ${colours[_random(lenB)]} ${nouns[_random(lenC)]}`
-	const id = ID++
-	const row = { id, label }
-	rows.push(row)
-	return row
-}
 
 const buildData = (count = DEFAULT_SIZE) => {
 	// TODO: test in single benchmark test suite
@@ -56,19 +50,20 @@ const deleteRow = (elem) => {
 
 const run = () => {
 	if (rows.length > 0) clear()
-	renderWithProvider(tbody, buildRow, 0, DEFAULT_SIZE, rows)
+	rows = buildData()
+	render(tbody, rows)
 }
 
 const add = () => {
 	let start = rows.length
-	appendWithProvider(tbody, buildRow, start, DEFAULT_SIZE, rows)
+	rows = rows.concat(buildData())
+	append(tbody, rows, start)
 }
 
 const runLots = () => {
-	Timer.start('tot', version)
 	if (rows.length > 0) clear()
-	renderWithProvider(tbody, buildRow, 0, DEFAULT_SIZE_RUN_LOTS, rows)
-	Timer.stop('tot')
+	rows = buildData(DEFAULT_SIZE_RUN_LOTS)
+	render(tbody, rows)
 }
 
 const update = () => {
@@ -140,13 +135,6 @@ const addEventListeners = () => {
 	}	
 	// eslint-disable-next-line unicorn/prefer-query-selector
 	globalThis.document.getElementById("main").addEventListener('click', e => actions.runAction(e))    
-}
-
-// Expose Timer to window for testing
-if (typeof globalThis.window !== 'undefined') {
-	globalThis.window.Timer = Timer
-} else if (typeof globalThis !== 'undefined') {
-	globalThis.Timer = Timer
 }
 
 globalThis.document.querySelector(".ver").innerHTML += `${version} (keyed)`

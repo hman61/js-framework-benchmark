@@ -1,0 +1,90 @@
+[
+  {
+    "framework": "vanillajs-lite-timer",
+    "version": "",
+    "result": [
+      51.641,
+      53.910000000000004,
+      52.166
+    ],
+    "average": 52.572333333333326,
+    "timestamp": "2026-02-01T05:14:58.251Z"
+  },
+  {
+    "framework": "doohtml-prov-tc-bind",
+    "version": "v0.98.8-dataProvider",
+    "result": [
+      58.577,
+      58.206999999999994,
+      58.499
+    ],
+    "average": 58.42766666666666,
+    "timestamp": "2026-02-01T05:14:58.251Z"
+  },
+  {
+    "framework": "doohtml-prov-nv",
+    "version": "v0.98.8-dataProvider",
+    "result": [
+      62.072,
+      57.899,
+      58.261
+    ],
+    "average": 59.410666666666664,
+    "timestamp": "2026-02-01T05:14:58.251Z"
+  },
+  {
+    "framework": "doohtml-prov-tc-min",
+    "version": "v0.98.8-prov-tc",
+    "result": [
+      58.299,
+      62.43300000000001,
+      58.337
+    ],
+    "average": 59.689666666666675,
+    "timestamp": "2026-02-01T05:14:58.251Z"
+  },
+  {
+    "framework": "doohtml-prov-nv-bind",
+    "version": "v0.98.8-dataProvider",
+    "result": [
+      64.474,
+      60.124,
+      56.71900000000001
+    ],
+    "average": 60.439,
+    "timestamp": "2026-02-01T05:14:58.251Z"
+  },
+  {
+    "framework": "vanillajs-timer",
+    "version": "",
+    "result": [
+      61.044000000000004,
+      61.45,
+      60.33299999999999
+    ],
+    "average": 60.94233333333333,
+    "timestamp": "2026-02-01T05:14:58.251Z"
+  },
+  {
+    "framework": "doohtml-buildData-tc",
+    "version": "v0.98.8-textContent",
+    "result": [
+      61.222,
+      62.439,
+      59.779999999999994
+    ],
+    "average": 61.147,
+    "timestamp": "2026-02-01T05:14:58.250Z"
+  },
+  {
+    "framework": "doohtml-prov-tc",
+    "version": "v0.98.8-prov-tc",
+    "result": [
+      63.500000000000014,
+      61.652,
+      63.742
+    ],
+    "average": 62.964666666666666,
+    "timestamp": "2026-02-01T05:14:58.251Z"
+  }
+]

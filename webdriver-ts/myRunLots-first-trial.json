@@ -1,0 +1,90 @@
+[
+  {
+    "framework": "vanillajs-lite-timer",
+    "version": "",
+    "result": [
+      54.04200000000001,
+      54.230999999999995,
+      54.08
+    ],
+    "average": 54.11766666666667,
+    "timestamp": "2026-02-01T05:03:53.912Z"
+  },
+  {
+    "framework": "vanillajs-timer",
+    "version": "",
+    "result": [
+      62.065,
+      59.791999999999994,
+      59.275999999999996
+    ],
+    "average": 60.37766666666666,
+    "timestamp": "2026-02-01T05:03:53.912Z"
+  },
+  {
+    "framework": "doohtml-buildData-tc",
+    "version": "v0.98.8-textContent",
+    "result": [
+      61.084,
+      60.46299999999999,
+      60.83599999999999
+    ],
+    "average": 60.79433333333333,
+    "timestamp": "2026-02-01T05:03:53.903Z"
+  },
+  {
+    "framework": "doohtml-prov-tc-min",
+    "version": "v0.98.8-prov-tc",
+    "result": [
+      61.653999999999996,
+      60.404999999999994,
+      61.759
+    ],
+    "average": 61.27266666666666,
+    "timestamp": "2026-02-01T05:03:53.912Z"
+  },
+  {
+    "framework": "doohtml-prov-nv-bind",
+    "version": "v0.98.8-dataProvider",
+    "result": [
+      57.91700000000001,
+      57.077999999999996,
+      71.197
+    ],
+    "average": 62.064,
+    "timestamp": "2026-02-01T05:03:53.912Z"
+  },
+  {
+    "framework": "doohtml-prov-tc-bind",
+    "version": "v0.98.8-dataProvider",
+    "result": [
+      63.65599999999999,
+      65.25399999999999,
+      59.367999999999995
+    ],
+    "average": 62.75933333333332,
+    "timestamp": "2026-02-01T05:03:53.912Z"
+  },
+  {
+    "framework": "doohtml-prov-tc",
+    "version": "v0.98.8-prov-tc",
+    "result": [
+      66.124,
+      65.607,
+      65.955
+    ],
+    "average": 65.89533333333333,
+    "timestamp": "2026-02-01T05:03:53.912Z"
+  },
+  {
+    "framework": "doohtml-prov-nv",
+    "version": "v0.98.8-dataProvider",
+    "result": [
+      76.23700000000001,
+      68.849,
+      58.229000000000006
+    ],
+    "average": 67.77166666666668,
+    "timestamp": "2026-02-01T05:03:53.912Z"
+  }
+]

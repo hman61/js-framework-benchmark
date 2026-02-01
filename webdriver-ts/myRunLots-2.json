@@ -1,0 +1,38 @@
+[
+  {
+    "framework": "doohtml-prov-tc-keyed",
+    "version": "v0.98.8-prov-tc",
+    "result": 53.41,
+    "timestamp": "2026-02-01T03:56:48.923Z"
+  },
+  {
+    "framework": "vanillajs-lite-timer-keyed",
+    "version": "",
+    "result": 54.49,
+    "timestamp": "2026-02-01T03:56:53.810Z"
+  },
+  {
+    "framework": "doohtml-prov-nv-bind-keyed",
+    "version": "v0.98.8-dataProvider",
+    "result": 57.62,
+    "timestamp": "2026-02-01T03:56:46.482Z"
+  },
+  {
+    "framework": "doohtml-prov-tc-bind-keyed",
+    "version": "v0.98.8-dataProvider",
+    "result": 60.625,
+    "timestamp": "2026-02-01T03:56:51.379Z"
+  },
+  {
+    "framework": "doohtml-prov-nv-keyed",
+    "version": "v0.98.8-dataProvider",
+    "result": 62.36,
+    "timestamp": "2026-02-01T03:56:44.014Z"
+  },
+  {
+    "framework": "doohtml-buildData-tc-keyed",
+    "version": "v0.98.8-textContent",
+    "result": 78.315,
+    "timestamp": "2026-02-01T03:56:41.549Z"
+  }
+]

@@ -1,30 +1,22 @@
 'use strict'
 
-import {Timer, adjectives, colours, nouns} from '../../doohtml-timer-and-data/Timer.js'
-import {render, createTemplate, append, appendWithProvider, renderWithProvider, version} from '../lib/doohtml.js'
-// TODO: verify this is the fastest way to get random integers in single benchmark test suite
+import {render, createTemplate, append, version} from '../lib/doohtml.mjs'
 
-const _random = max => Math.trunc(Math.random() * max)
+const _random = max => Math.random() * max | 0
+
+const adjectives = ["pretty", "large", "big", "small", "tall", "short", "long", "handsome", "plain", "quaint", "clean", "elegant", "easy", "angry", "crazy", "helpful", "mushy", "odd", "unsightly", "adorable", "important", "inexpensive", "cheap", "expensive", "fancy"]
+const colours = ["red", "yellow", "blue", "green", "pink", "brown", "purple", "brown", "white", "black", "orange"]
+const nouns = ["table", "chair", "house", "bbq", "desk", "car", "pony", "cookie", "sandwich", "burger", "pizza", "mouse", "keyboard"]
 
 const lenA = adjectives.length, lenB = colours.length, lenC = nouns.length
 
-const DEFAULT_SIZE = 1000, DEFAULT_SIZE_RUN_LOTS = 10000, SWAP_ROW = 998, BANG = ' !!!', DANGER = 'danger', TR = 'tr'
+const DEFAULT_SIZE = 1000, DEFAULT_SIZE_RUN_LOTS = 10000, SWAP_ROW = 998, BANG = ' !!!', DANGER = 'danger'
 
-let rows = [], ID = 1, selectedRow, tbody = null 
+let rows = [], ID = 1, selectedRow = undefined, tbody = null 
 
-
-const buildRow = (index, rows) => {
-	// TODO: test in single benchmark test suite
-	const label = `${adjectives[_random(lenA)]} ${colours[_random(lenB)]} ${nouns[_random(lenC)]}`
-	const id = ID++
-	const row = { id, label }
-	rows.push(row)
-	return row
-}
 
 const buildData = (count = DEFAULT_SIZE) => {
-	// TODO: test in single benchmark test suite
-	const data = Array.from({length: count})
+	const data = Array(count)
 	for (let i = 0; i < count; i = i + 1) {
 		const label = `${adjectives[_random(lenA)]} ${colours[_random(lenB)]} ${nouns[_random(lenC)]}`
 		const id = ID++
@@ -43,7 +35,7 @@ const getIndex = (key) => {
 }
 
 const deleteRow = (elem) => {
-	const row = elem.closest(TR)
+	const row = elem.closest('tr')
 	if (row) {
 		const key = row.key 
 		const idx = getIndex(key)
@@ -55,20 +47,21 @@ const deleteRow = (elem) => {
 }
 
 const run = () => {
-	if (rows.length > 0) clear()
-	renderWithProvider(tbody, buildRow, 0, DEFAULT_SIZE, rows)
+	if (rows.length) clear()
+	rows = buildData()
+	render(tbody, rows)
 }
 
 const add = () => {
 	let start = rows.length
-	appendWithProvider(tbody, buildRow, start, DEFAULT_SIZE, rows)
+	rows = rows.concat(buildData())
+	append(tbody, rows, start)
 }
 
 const runLots = () => {
-	Timer.start('tot', version)
-	if (rows.length > 0) clear()
-	renderWithProvider(tbody, buildRow, 0, DEFAULT_SIZE_RUN_LOTS, rows)
-	Timer.stop('tot')
+	if (rows.length) clear()
+	rows = buildData(DEFAULT_SIZE_RUN_LOTS)
+	render(tbody, rows)
 }
 
 const update = () => {
@@ -84,7 +77,7 @@ const select = (elem) => {
 	}
 	
 	if (elem) {
-		const row = elem.closest(TR)
+		const row = elem.closest('tr')
 		if (row) {
 			selectedRow = row
 			row.className = DANGER
@@ -123,6 +116,7 @@ const init = async () => {
 		}
 	})
 }
+
 const addEventListeners = () => {
 	const actions = {
 		'run': run,
@@ -138,18 +132,10 @@ const addEventListeners = () => {
 			}	
 		}
 	}	
-	// eslint-disable-next-line unicorn/prefer-query-selector
-	globalThis.document.getElementById("main").addEventListener('click', e => actions.runAction(e))    
+	document.getElementById("main").addEventListener('click', e => actions.runAction(e))    
 }
 
-// Expose Timer to window for testing
-if (typeof globalThis.window !== 'undefined') {
-	globalThis.window.Timer = Timer
-} else if (typeof globalThis !== 'undefined') {
-	globalThis.Timer = Timer
-}
-
-globalThis.document.querySelector(".ver").innerHTML += `${version} (keyed)`
-globalThis.document.title += ` (keyed)`
+document.querySelector(".ver").innerHTML += `${version} (keyed)`
+document.title += ` (keyed)`
 addEventListeners()
 init()

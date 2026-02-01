@@ -14,6 +14,8 @@
     "resultsFirefox": "node dist/createResultJS.js --browser firefox && cd .. && cd webdriver-ts-results && npm run build-prod",
     "resultsSafari": "node dist/createResultJS.js --browser safari && cd .. && cd webdriver-ts-results && npm run build-prod",
     "isKeyed": "cross-env LANG=\"en_US.UTF-8\" node dist/isKeyed.js",
+    "testRunLots": "cross-env LANG=\"en_US.UTF-8\" tsx src/testRunLots.ts",
+    "doo-testRunLots": "cross-env LANG=\"en_US.UTF-8\" tsx src/doo-testRunLots.ts",
     "test": "vitest --run",
     "test:watch": "vitest",
     "coverage": "vitest --run --coverage"
@@ -28,6 +30,7 @@
     "@types/yargs": "17.0.35",
     "@vitest/coverage-v8": "^4.0.15",
     "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
     "typescript": "5.9.3",
     "vitest": "^4.0.15"
   },

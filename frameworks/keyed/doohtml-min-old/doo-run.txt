@@ -1,0 +1,9 @@
+npm run bench -- --framework keyed/doohtml-all-tc-bind --framework keyed/doohtml-0-98-3 --framework keyed/doohtml-500  --framework  keyed/vanillajs --framework  keyed/vanillajs-lite keyed/vanillajs-lite-tC --benchmark 01_ 02_ 03_ 04_ 05_ 06_ 07_ 08_ 09_   
+
+
+npm run bench -- --framework keyed/doohtml-all-bind-rowfn --benchmark 01_ 02_ 03_ 04_ 05_ 06_ 07_ 08_ 09_
+
+npm run bench -- --framework keyed/doohtml-prov-tc --framework keyed/doohtml-prov-tc-bind --framework keyed/doohtml-prov-nv --framework keyed/doohtml-prov-nv-bind keyed/vanillajs --framework  keyed/vanillajs-lite --benchmark 01_ 02_ 07_ 08_
+npm run bench -- --framework keyed/doohtml-buildData-tc --framework keyed/doohtml-prov-tc --framework keyed/doohtml-prov-tc-bind --framework keyed/doohtml-prov-nv --framework keyed/doohtml-prov-nv-bind keyed/vanillajs --framework  keyed/vanillajs-lite --benchmark 01_ 02_ 03_ 04_ 05_ 06_ 07_ 08_ 09_
+
+cd webdriver-ts && npm run doo-testRunLots -- --framework doohtml-prov-tc --framework doohtml-prov-tc-bind --framework doohtml-prov-nv --framework doohtml-prov-nv-bind --framework doohtml-buildData-tc --framework vanillajs-lite-timer

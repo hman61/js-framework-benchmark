@@ -11,7 +11,6 @@ const Config = {
 const {cloneNode} = globalThis.Node.prototype;
 const cloneDeep = n => cloneNode.call(n, true);
 
-
 // TODO: test in single benchmark test suite
 // const cloneDeep = (node) => {
 //     if (!node || typeof node.cloneNode !== 'function') return node;
@@ -19,7 +18,7 @@ const cloneDeep = n => cloneNode.call(n, true);
 // };
 
 
-const version = 'v0.98.8-prov-tc'
+const version = 'v0.98.8-textContent'
 
 const getItemValue = (item, prop) => {
     if (!prop.includes('.')) {
@@ -38,22 +37,6 @@ const isTable = (node) => {
 	return ['TABLE','TBODY','THEAD','TFOOT','TR','TH'].includes(node.tagName)
 }
 
-const setNodeValues = (node, dataItem, dataSlots) => {
-	const len = dataSlots.length
-	for (let x = 0; x < len; x++) {
-		const curNode = getNode(node, dataSlots[x][1], 0)
-		if (curNode) {
-			if (dataSlots[x][2] === 'textContent') {
-				curNode.textContent = dataItem[dataSlots[x][0]]
-			} else {
-				curNode.setAttribute(dataSlots[x][2], dataItem[dataSlots[x][0]])
-			}
-		} else {
-			globalThis.console.log('Field:' + dataSlots[x][0] + ' does not exist')
-		}
-	}
-}
-
 const render = (target, data, start = 0) => {
 	if (data.length === 0) {
 		target.textContent = ''
@@ -68,65 +51,32 @@ const renderHTML = (target, data, start = 0, end=null) => {
 	let	stop = end ? start + dataLen :  dataLen - start
 	if (stop > dataLen) { stop = dataLen }
 
+	const len = target.dataSlots.length
+	const _setNodeValues = (node,i)  => {
+		for (let x=0; x<len;x++) {
+			const curNode = getNode(node,target.dataSlots[x][1],0)
+			if (curNode) {
+				if (target.dataSlots[x][2] === 'textContent') {
+					curNode.textContent = data[i][target.dataSlots[x][0]]
+				} else {
+					curNode.setAttribute(target.dataSlots[x][2], data[i][target.dataSlots[x][0]])
+				}	
+			} else {
+				console.info('Field:' + target.dataSlots[x][0] + ' does not exist')
+			}
+		}	
+	}
 	const key = target[Config.KEY]
 	for (let i = start; i<stop; ++i) {
-		setNodeValues(target.processNode, data[i], target.dataSlots)
+		_setNodeValues(target.processNode, i)
 		let cloned = cloneDeep(target.processNode)
 		cloned[Config.KEY] = getItemValue(data[i],key)
 		target.append(cloned)
-
 	}
-
-}
-
-const renderHTMLWithProvider = (target, dataProvider, start = 0, length = null, rows = []) => {
-	if (length === null || length === 0) {
-		return
-	}
-	
-	const stop = start + length
-	const key = target[Config.KEY]
-	
-	// Single loop: call provider for each index and immediately inject
-	for (let i = start; i < stop; ++i) {
-		// Call provider to get single data object for this index (provider will push to rows)
-		const dataItem = dataProvider(i, rows)
-		
-		// Immediately inject into HTML template
-		setNodeValues(target.processNode, dataItem, target.dataSlots)
-		let cloned = cloneDeep(target.processNode)
-		cloned[Config.KEY] = getItemValue(dataItem, key)
-		target.append(cloned)
-	}
-}
-
-const renderWithProvider = (target, dataProvider, start = 0, length = null, rows = []) => {
-	renderHTMLWithProvider(target, dataProvider, start, length, rows)
 }
 
 const append = (target, dataSet, start=0) => {
 	renderHTML(target, dataSet, start , dataSet.length - start)
-}
-
-const appendWithProvider = (target, dataProvider, start = 0, length = null, rows = []) => {
-	if (length === null || length === 0) {
-		return
-	}
-	
-	const stop = start + length
-	const key = target[Config.KEY]
-	
-	// Single loop: call provider for each index and immediately inject
-	for (let i = start; i < stop; ++i) {
-		// Call provider to get single data object for this index (provider will push to rows)
-		const dataItem = dataProvider(i, rows)
-		
-		// Immediately inject into HTML template
-		setNodeValues(target.processNode, dataItem, target.dataSlots)
-		let cloned = cloneDeep(target.processNode)
-		cloned[Config.KEY] = getItemValue(dataItem, key)
-		target.append(cloned)
-	}
 }	
 
 const dooParse = (argDataNode) => { 
@@ -255,13 +205,13 @@ const dooParse = (argDataNode) => {
 
 const fetchTemplate = (url) => {
 	return new Promise((resolve, reject) => {
-		// eslint-disable-next-line no-undef
-		const xhr = new XMLHttpRequest()
-		xhr.open("GET", url)
-		xhr.addEventListener('load', () => resolve(xhr.responseText))
-		// eslint-disable-next-line unicorn/prefer-add-event-listener
-		xhr.onerror = () => reject(xhr.statusText)
-		xhr.send()
+	  // eslint-disable-next-line no-undef
+	  const xhr = new XMLHttpRequest()
+	  xhr.open("GET", url)
+	  xhr.addEventListener('load', () => resolve(xhr.responseText))
+	  // eslint-disable-next-line unicorn/prefer-add-event-listener
+	  xhr.onerror = () => reject(xhr.statusText)
+	  xhr.send()
 	})
 }
 
@@ -290,7 +240,7 @@ const setReactiveDataNodes = (tplNode) => {
 			const dataElem = '|STYLE|LINK|'.includes(`|${elem.tagName}|`)
 				? elem
 				: elem.parentElement &&
-				'|DL|UL|TBODY|THEAD|TFOOT|TR|SELECT|SECTION|'.includes(`|${elem.parentElement.tagName}|`)
+				  '|DL|UL|TBODY|THEAD|TFOOT|TR|SELECT|SECTION|'.includes(`|${elem.parentElement.tagName}|`)
 				? elem.parentElement
 				: elem.parentElement // globalThis.document.createElement('data') TODO: add infinite vertical scroll using a data element wrapper
 
@@ -375,4 +325,4 @@ const createTemplate = async (id, data = [], src = null) => {
 	
     return templateNode["place"][0]
 }
-export  {createTemplate, append, appendWithProvider, render, renderWithProvider, Config , version, prefetchTemplate}
+export  {createTemplate, append, render, Config , version, prefetchTemplate}
