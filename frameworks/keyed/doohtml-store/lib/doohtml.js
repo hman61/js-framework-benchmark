@@ -8,21 +8,13 @@ const Config = {
 	KEY:'key'
 }
 
-const {cloneNode, appendChild} = globalThis.Node.prototype;
-const cloneDeep = n => cloneNode.call(n, true);
+const {cloneNode, appendChild} = globalThis.Node.prototype
+const cloneDeep = n => cloneNode.call(n, true)
 const appendRow = function(child) {
 	return appendChild.call(this, child);
 };
 
-
-// TODO: test in single benchmark test suite
-// const cloneDeep = (node) => {
-//     if (!node || typeof node.cloneNode !== 'function') return node;
-//     return node.cloneNode(true); // Deep clone for DOM
-// };
-
-
-const version = 'v0.98.8-dataProvider'
+const version = 'v0.98.8'
 
 const getItemValue = (item, prop) => {
     if (!prop.includes('.')) {
@@ -90,30 +82,23 @@ const renderHTMLWithProvider = (target, dataProvider, start = 0, length = null, 
 	const key = target[Config.KEY]
 	const insertRow = appendRow.bind(target)
 	
-	// Get the table parent (assuming target is tbody)
 	const table = target.parentElement
 	const wasAttached = table && table.contains(target)
 	
-	// Detach tbody from DOM if attached (like vanillajs-lite-timer approach)
 	if (wasAttached) {
 		target.remove()
 	}
 	
-	// Simple loop - no batching, work on detached node
 	for (let i = start; i < stop; ++i) {
-		// Call provider to get single data object for this index
 		const dataItem = dataProvider(i, rows)
-		
-		// Set values and clone the process node
 		setNodeValues(target.processNode, dataItem, target.dataSlots)
 		let cloned = cloneDeep(target.processNode)
 		cloned[Config.KEY] = getItemValue(dataItem, key)
 		insertRow(cloned)
 	}
 	
-	// Re-attach tbody to table if it was attached (single reflow at the end)
 	if (wasAttached && table) {
-		table.appendChild(target)
+		table.append(target)
 	}
 }
 
