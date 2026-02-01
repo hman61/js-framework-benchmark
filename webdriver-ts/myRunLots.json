@@ -1,0 +1,68 @@
+[
+  {
+    "framework": "vanillajs-lite-timer",
+    "version": "",
+    "result": [
+      52.358000000000004,
+      54.57000000000001,
+      52.746
+    ],
+    "average": 53.22466666666667,
+    "timestamp": "2026-02-01T13:12:44.787Z"
+  },
+  {
+    "framework": "doohtml-prov-nv-bind-store",
+    "version": "v0.98.8-dataProvider",
+    "result": [
+      61.705,
+      58.511,
+      58.38099999999999
+    ],
+    "average": 59.532333333333334,
+    "timestamp": "2026-02-01T13:12:44.787Z"
+  },
+  {
+    "framework": "doohtml-prov-tc-bind",
+    "version": "v0.98.8-dataProvider",
+    "result": [
+      57.102999999999994,
+      59.086,
+      64.454
+    ],
+    "average": 60.21433333333332,
+    "timestamp": "2026-02-01T13:12:44.787Z"
+  },
+  {
+    "framework": "doohtml-prov-nv-bind",
+    "version": "v0.98.8-dataProvider",
+    "result": [
+      57.824,
+      57.302,
+      70.566
+    ],
+    "average": 61.897333333333336,
+    "timestamp": "2026-02-01T13:12:44.787Z"
+  },
+  {
+    "framework": "doohtml-prov-nv",
+    "version": "v0.98.8-dataProvider",
+    "result": [
+      64.803,
+      65.076,
+      59.528999999999996
+    ],
+    "average": 63.135999999999996,
+    "timestamp": "2026-02-01T13:12:44.778Z"
+  },
+  {
+    "framework": "doohtml-prov-tc",
+    "version": "v0.98.8-prov-tc",
+    "result": [
+      66.613,
+      64.776,
+      64.845
+    ],
+    "average": 65.41133333333333,
+    "timestamp": "2026-02-01T13:12:44.787Z"
+  }
+]
