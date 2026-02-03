@@ -8,17 +8,13 @@ const Config = {
 	KEY:'key'
 }
 
-const {cloneNode} = globalThis.Node.prototype;
-const cloneDeep = n => cloneNode.call(n, true);
+const {cloneNode, appendChild} = globalThis.Node.prototype
+const cloneDeep = n => cloneNode.call(n, true)
+const appendRow = function(child) {
+	return appendChild.call(this, child);
+};
 
-// TODO: test in single benchmark test suite
-// const cloneDeep = (node) => {
-//     if (!node || typeof node.cloneNode !== 'function') return node;
-//     return node.cloneNode(true); // Deep clone for DOM
-// };
-
-
-const version = 'v0.98.8-textContent'
+const version = 'v0.98.9'
 
 const getItemValue = (item, prop) => {
     if (!prop.includes('.')) {
@@ -37,12 +33,59 @@ const isTable = (node) => {
 	return ['TABLE','TBODY','THEAD','TFOOT','TR','TH'].includes(node.tagName)
 }
 
+const setNodeValues = (node, dataItem, dataSlots) => {
+	const len = dataSlots.length
+	for (let x = 0; x < len; x++) {
+		const curNode = getNode(node, dataSlots[x][1], 0)
+		if (curNode) {
+			if (dataSlots[x][2] === 'textContent') {
+				curNode.nodeValue = dataItem[dataSlots[x][0]]
+			} else {
+				curNode.setAttribute(dataSlots[x][2], dataItem[dataSlots[x][0]])
+			}
+		} else {
+			globalThis.console.log('Field:' + dataSlots[x][0] + ' does not exist')
+		}
+	}
+}
+
 const render = (target, data, start = 0) => {
 	if (data.length === 0) {
 		target.textContent = ''
 		return
 	} 
 	renderHTML(target, data, start)
+}	
+// const optimizedClear = (node) => {
+// let ID = 1, SEL, TMPL, SIZE;
+// const [[TABLE], [TBODY], [TROW], BUTTONS] = 'table,tbody,#trow,button'
+//     .split(',').map(s => document.querySelectorAll(s)), ROWS = TBODY.children;
+
+// const {cloneNode, insertBefore} = Node.prototype;
+// const clone = n => cloneNode.call(n, true);
+// const insert = insertBefore.bind(TBODY);
+// debugger
+// const create = (count, add) => {
+//     if (SIZE !== count)
+//         TMPL = clone(TROW.content), [...Array((SIZE = count) / 50 - 1)]
+//             .forEach(() => TMPL.appendChild(clone(TMPL.firstChild)));
+//     !add && (clear(), TBODY.remove());
+//     while (count) {
+//         for (const r of TMPL.children)
+//             (r.$id ??= r.firstChild.firstChild).nodeValue = ID++,
+//             (r.$label ??= labelOf(r)).nodeValue = label(), count--;
+//         insert(clone(TMPL), null);
+//     }
+//     !add && TABLE.appendChild(TBODY);
+// }
+
+const createTemplateCache = (node, size=20) => {
+	const fragment = document.createDocumentFragment()
+	for (let i = 0; i < size; i++) {
+		fragment.appendChild(cloneDeep(node))
+	}
+	globalThis.rowTemplate = fragment  // Store fragment for cloning
+	return fragment.childNodes
 }	
 
 const renderHTML = (target, data, start = 0, end=null) => {
@@ -51,32 +94,99 @@ const renderHTML = (target, data, start = 0, end=null) => {
 	let	stop = end ? start + dataLen :  dataLen - start
 	if (stop > dataLen) { stop = dataLen }
 
-	const len = target.dataSlots.length
-	const _setNodeValues = (node,i)  => {
-		for (let x=0; x<len;x++) {
-			const curNode = getNode(node,target.dataSlots[x][1],0)
-			if (curNode) {
-				if (target.dataSlots[x][2] === 'textContent') {
-					curNode.nodeValue = data[i][target.dataSlots[x][0]]
-				} else {
-					curNode.setAttribute(target.dataSlots[x][2], data[i][target.dataSlots[x][0]])
-				}	
-			} else {
-				console.info('Field:' + target.dataSlots[x][0] + ' does not exist')
-			}
-		}	
-	}
+	// Clear existing content
+	const tempTarget = cloneDeep(target)
 	const key = target[Config.KEY]
-	for (let i = start; i<stop; ++i) {
-		_setNodeValues(target.processNode, i)
-		let cloned = cloneDeep(target.processNode)
-		cloned[Config.KEY] = getItemValue(data[i],key)
-		target.append(cloned)
+
+	const table = target.parentElement
+	const wasAttached = table && table.contains(target)
+	
+	if (wasAttached) {
+		target.remove()
+	}	
+
+
+	if (!globalThis.rowTemplate) {
+		globalThis.rowTemplate = createTemplateCache(target.processNode, dataLen/50)
+	} 
+	
+	let i = start;
+    while (dataLen) {
+		const fragment = document.createDocumentFragment()
+		for (let j = 0, len = globalThis.rowTemplate.length; j < len; j++) {
+			const item = cloneDeep(globalThis.rowTemplate[j])
+			setNodeValues(item, data[i], target.dataSlots)
+			//let cloned = cloneDeep(item)
+			item[Config.KEY] = getItemValue(data[i],key)
+
+			fragment.append(item)
+			i++
+			dataLen--;
+		}
+		target.append(fragment)
+		if (wasAttached && table) {
+			table.append(target)
+		}
 	}
+}
+
+const renderHTMLWithProvider = (target, dataProvider, start = 0, length = null, rows = []) => {
+	if (length === null || length === 0) {
+		return
+	}
+	
+	const stop = start + length
+	const key = target[Config.KEY]
+	const insertRow = appendRow.bind(target)
+	
+	const table = target.parentElement
+	const wasAttached = table && table.contains(target)
+	
+	if (wasAttached) {
+		target.remove()
+	}
+	
+	for (let i = start; i < stop; ++i) {
+		const dataItem = dataProvider(i, rows)
+		setNodeValues(target.processNode, dataItem, target.dataSlots)
+		let cloned = cloneDeep(target.processNode)
+		cloned[Config.KEY] = getItemValue(dataItem, key)
+		insertRow(cloned)
+	}
+	
+	if (wasAttached && table) {
+		table.append(target)
+	}
+}
+
+const renderWithProvider = (target, dataProvider, start = 0, length = null, rows = []) => {
+	renderHTMLWithProvider(target, dataProvider, start, length, rows)
 }
 
 const append = (target, dataSet, start=0) => {
 	renderHTML(target, dataSet, start , dataSet.length - start)
+}
+
+const appendWithProvider = (target, dataProvider, start = 0, length = null, rows = []) => {
+	if (length === null || length === 0) {
+		return
+	}
+	
+	const stop = start + length
+	const key = target[Config.KEY]
+	const insertRow = appendRow.bind(target)
+	
+	// Simple loop - append to existing content (keep attached)
+	for (let i = start; i < stop; ++i) {
+		// Call provider to get single data object for this index
+		const dataItem = dataProvider(i, rows)
+		
+		// Set values and clone the process node
+		setNodeValues(target.processNode, dataItem, target.dataSlots)
+		let cloned = cloneDeep(target.processNode)
+		cloned[Config.KEY] = getItemValue(dataItem, key)
+		insertRow(cloned)
+	}
 }	
 
 const dooParse = (argDataNode) => { 
@@ -164,7 +274,6 @@ const dooParse = (argDataNode) => {
 				const fld = match.replaceAll(/\{\{|\}\}/g, '').trim()
 				const textNode = globalThis.document.createTextNode(fld)
 				currentNode.textContent = ''
-				// eslint-disable-next-line unicorn/prefer-dom-node-append
 				const newNode = parent.appendChild(textNode)
 				addDataSlot(newNode, fld, 'textContent')
 			})
@@ -205,13 +314,11 @@ const dooParse = (argDataNode) => {
 
 const fetchTemplate = (url) => {
 	return new Promise((resolve, reject) => {
-	  // eslint-disable-next-line no-undef
-	  const xhr = new XMLHttpRequest()
-	  xhr.open("GET", url)
-	  xhr.addEventListener('load', () => resolve(xhr.responseText))
-	  // eslint-disable-next-line unicorn/prefer-add-event-listener
-	  xhr.onerror = () => reject(xhr.statusText)
-	  xhr.send()
+		const xhr = new XMLHttpRequest()
+		xhr.open("GET", url)
+		xhr.addEventListener('load', () => resolve(xhr.responseText))
+		xhr.onerror = () => reject(xhr.statusText)
+		xhr.send()
 	})
 }
 
@@ -240,7 +347,7 @@ const setReactiveDataNodes = (tplNode) => {
 			const dataElem = '|STYLE|LINK|'.includes(`|${elem.tagName}|`)
 				? elem
 				: elem.parentElement &&
-				  '|DL|UL|TBODY|THEAD|TFOOT|TR|SELECT|SECTION|'.includes(`|${elem.parentElement.tagName}|`)
+				'|DL|UL|TBODY|THEAD|TFOOT|TR|SELECT|SECTION|'.includes(`|${elem.parentElement.tagName}|`)
 				? elem.parentElement
 				: elem.parentElement // globalThis.document.createElement('data') TODO: add infinite vertical scroll using a data element wrapper
 
@@ -257,7 +364,6 @@ const setReactiveDataNodes = (tplNode) => {
 			})
 
 			if (dataElem.tagName === 'DATA' || dataElem.tagName === 'STYLE' || dataElem.tagName === 'LINK') {
-				// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 				elem.parentElement?.replaceChild(dataElem, elem) || console.warn('Templates should only have one child node')
 			}
 
@@ -325,4 +431,4 @@ const createTemplate = async (id, data = [], src = null) => {
 	
     return templateNode["place"][0]
 }
-export  {createTemplate, append, render, Config , version, prefetchTemplate}
+export  {createTemplate, append, appendWithProvider, render, renderWithProvider, Config , version, prefetchTemplate}

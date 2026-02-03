@@ -16,6 +16,7 @@ const create = (count, add) => {
         TMPL = clone(TROW.content), [...Array((SIZE = count) / 50 - 1)]
             .forEach(() => TMPL.appendChild(clone(TMPL.firstChild)));
     !add && (clear(), TBODY.remove());
+    console.log(TMPL.children.length,(SIZE = count) / 50 - 1)
     while (count) {
         for (const r of TMPL.children)
             (r.$id ??= r.firstChild.firstChild).nodeValue = ID++,

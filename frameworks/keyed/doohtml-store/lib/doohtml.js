@@ -88,7 +88,7 @@ const renderHTMLWithProvider = (target, dataProvider, start = 0, length = null, 
 	if (wasAttached) {
 		target.remove()
 	}
-	
+	debugger
 	for (let i = start; i < stop; ++i) {
 		const dataItem = dataProvider(i, rows)
 		setNodeValues(target.processNode, dataItem, target.dataSlots)
