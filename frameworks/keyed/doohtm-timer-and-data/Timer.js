@@ -4,7 +4,7 @@ const Timer = {
     version: 'v0.98.8',
     start(name, version) {
         if (!Timer.time[name]) {
-            Timer.time[name] = [performance.now()]
+            Timer.time[name] = [globalThis.performance.now()]
         }
         Timer.version = version
     },
@@ -12,14 +12,11 @@ const Timer = {
         const round = (name, dec = 3) => {
             const num = Timer.time[name][1] - Timer.time[name][0]
             const result = Math.round(num * Math.pow(10, dec)) / Math.pow(10, dec)
-            if (globalThis.location.href.includes('doolog') ? true : false) {
-                console.log(name, ':', result);
-            }
             return result
         }
 
         if (Timer.time[name]) {
-            Timer.time[name].push(performance.now())
+            Timer.time[name].push(globalThis.performance.now())
 
             if (name === 'clear') {
                 globalThis.document.title = 'c:' + round(name) + ' |' + globalThis.document.title
@@ -35,6 +32,7 @@ const Timer = {
                 if (Timer.totResults.length >= 6) {
                     const results = Timer.totResults.slice(1, 6)
                     const avg = results.reduce((a, b) => a + b, 0) / results.length
+                    // eslint-disable-next-line no-undef
                     console.log(Timer.version, "Avg.", avg, results)
                     Timer.totResults = []
                 }
